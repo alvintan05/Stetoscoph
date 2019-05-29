@@ -1,3 +1,14 @@
 <resources>
-    <string name="app_name">Stetoscoph</string>
+    <string name="app_name">Wireless Stetoscoph</string>
+    <string name="title">WIRELESS STETOSCOPH ELECTRONIC</string>
+    <string name="home_title">Heart Monitoring</string>
+    <string name="username">Username</string>
+    <string name="product_code">Product Code</string>
+    <string name="submit">Submit</string>
+    <string name="frekuensi_detak_jantung">Frekuensi Detak Jantung</string>
+    <string name="bit">Bit</string>
+    <string name="save_data">Save Data</string>
+    <string name="klasifikasi_jantung">Klasifikasi Jantung</string>
+    <string name="open">Drawer Open</string>
+    <string name="close">Drawer Close</string>
 </resources>
