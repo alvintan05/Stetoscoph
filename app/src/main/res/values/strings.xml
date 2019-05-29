@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Wireless Stetoscoph</string>
+    <string name="app_name">Stetoscoph</string>
     <string name="title">WIRELESS STETOSCOPH ELECTRONIC</string>
     <string name="home_title">Heart Monitoring</string>
     <string name="username">Username</string>
@@ -11,4 +11,7 @@
     <string name="klasifikasi_jantung">Klasifikasi Jantung</string>
     <string name="open">Drawer Open</string>
     <string name="close">Drawer Close</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
