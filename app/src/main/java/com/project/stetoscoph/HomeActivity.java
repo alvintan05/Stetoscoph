@@ -76,20 +76,19 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         switch (menuItem.getItemId()) {
             case R.id.menu_pairing:
-                Toast.makeText(this, "Sukses", Toast.LENGTH_SHORT).show();
                 fragment = new PairProductFragment();
                 title = "Pairing Product";
                 break;
             case R.id.menu_graph:
-                Toast.makeText(this, "Sukses", Toast.LENGTH_SHORT).show();
+                fragment = new GraphFragment();
                 title = "Graph";
                 break;
             case R.id.menu_report:
-                Toast.makeText(this, "Sukses", Toast.LENGTH_SHORT).show();
+                fragment = new ReportFragment();
                 title = "Report";
                 break;
             case R.id.menu_lock:
-                Toast.makeText(this, "Sukses", Toast.LENGTH_SHORT).show();
+                fragment = new LockFragment();
                 title = "Lock App";
                 break;
         }

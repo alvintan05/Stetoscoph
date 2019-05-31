@@ -33,8 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_submit:
-                //validateLength();
-                intent();
+                validateLength();
                 break;
         }
     }
@@ -42,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void validateLength() {
         int c = edtCode.getText().toString().trim().length();
         if (c < 8)
-            textInputLayout.setError("Minimal 8 Karakter !");
+            textInputLayout.setError("Code must have 8 characters !");
         if (c >= 8) {
             checkCode();
         }
@@ -57,22 +56,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case "11111111":
                 intent();
                 break;
-            case "22222222":
-                intent();
-                break;
-            case "33333333":
-                intent();
-                break;
-            case "44444444":
-                intent();
-                break;
             default:
-                Toast.makeText(this, "Code not valid", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Code Invalid", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void intent() {
-        Toast.makeText(this, "Code Activated", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Product Activated", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(MainActivity.this, HomeActivity.class));
         finish();
     }
