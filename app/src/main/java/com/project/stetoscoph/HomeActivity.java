@@ -22,6 +22,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     Toolbar toolbar;
     LinearLayout exit;
 
+    SessionLogin session;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +38,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView.setCheckedItem(R.id.menu_pairing);
         navigationView.setNavigationItemSelectedListener(this);
+
+        session = new SessionLogin(getApplicationContext());
+
+        if (session.checkLogin())
+            finish();
 
         if (savedInstanceState == null) {
             Fragment currentFragment = new PairProductFragment();

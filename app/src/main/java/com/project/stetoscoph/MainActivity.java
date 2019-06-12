@@ -1,6 +1,8 @@
 package com.project.stetoscoph;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,8 +15,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // widget
     private Button btnSubmit;
-    private EditText edtCode;
+    private EditText edtCode, edtUsername;
     private TextInputLayout textInputLayout;
+
+    SessionLogin session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +28,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // initialization
         btnSubmit = (Button) findViewById(R.id.btn_submit);
         edtCode = (EditText) findViewById(R.id.edt_code);
+        edtUsername = (EditText) findViewById(R.id.edt_username);
         textInputLayout = (TextInputLayout) findViewById(R.id.text_input_code);
+
+        session = new SessionLogin(getApplicationContext());
 
         btnSubmit.setOnClickListener(this);
     }
@@ -48,22 +55,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void checkCode() {
+        String u = edtUsername.getText().toString().trim();
         String c = edtCode.getText().toString().trim();
         switch (c) {
             case "12345678":
-                intent();
+                loginUser(u, c);
                 break;
             case "11111111":
-                intent();
+                loginUser(u, c);
                 break;
             default:
                 Toast.makeText(this, "Code Invalid", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void intent() {
+    private void loginUser(String username, String code) {
+        Intent i = new Intent(MainActivity.this, HomeActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
+
+        session.createUserLoginSession(username, code);
         Toast.makeText(this, "Product Activated", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(MainActivity.this, HomeActivity.class));
-        finish();
     }
 }
