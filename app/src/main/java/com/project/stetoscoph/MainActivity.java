@@ -71,9 +71,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void loginUser(String username, String code) {
         Intent i = new Intent(MainActivity.this, HomeActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
+        finish();
 
         session.createUserLoginSession(username, code);
         Toast.makeText(this, "Product Activated", Toast.LENGTH_SHORT).show();

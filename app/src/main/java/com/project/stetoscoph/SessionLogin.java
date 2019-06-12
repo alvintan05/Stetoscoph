@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 public class SessionLogin {
+    // class ini untuk mengatur sesi login
 
     // vars
     private static final String PREFERENCES_NAME = "MyPrefs";
