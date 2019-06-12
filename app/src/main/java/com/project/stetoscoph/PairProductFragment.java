@@ -2,14 +2,21 @@ package com.project.stetoscoph;
 
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 /**
@@ -17,6 +24,7 @@ import android.widget.Toast;
  */
 public class PairProductFragment extends Fragment {
 
+    private static final String TAG = "PairProductFragment";
     Button btnOn, btnOff;
 
 
@@ -35,20 +43,34 @@ public class PairProductFragment extends Fragment {
         btnOn = (Button) v.findViewById(R.id.btn_bluetooth_on);
         btnOff = (Button) v.findViewById(R.id.btn_bluetooth_off);
 
+//        btnOn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startActivity(new Intent(getActivity(), BluetoothListActivity.class));
+//            }
+//        });
+//
+//        btnOff.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                BluetoothListActivity.disconnect();
+//            }
+//        });
+
         final BluetoothAdapter bAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // click
         btnOn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (bAdapter == null)
-                    Toast.makeText(getActivity(), "Bluetooth not supported", Toast.LENGTH_SHORT).show();
-                else {
-                    if (!bAdapter.isEnabled()) {
-                        startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1);
-                        Toast.makeText(getActivity(), "Bluetooth turned on", Toast.LENGTH_SHORT).show();
-                    }
-                }
+//                if (bAdapter == null)
+//                    Toast.makeText(getActivity(), "Bluetooth not supported", Toast.LENGTH_SHORT).show();
+//                else {
+//                    if (!bAdapter.isEnabled()) {
+//                        startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1);
+//                        Toast.makeText(getActivity(), "Bluetooth turned on", Toast.LENGTH_SHORT).show();
+//                    }
+//                }
             }
         });
 
@@ -62,5 +84,4 @@ public class PairProductFragment extends Fragment {
 
         return v;
     }
-
 }
