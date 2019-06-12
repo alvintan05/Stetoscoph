@@ -55,9 +55,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(HomeActivity.this, "Exit", Toast.LENGTH_SHORT).show();
+                Toast.makeText(HomeActivity.this, "Log Out", Toast.LENGTH_SHORT).show();
+                session.deleteUserLoginSession();
                 finish();
-                System.exit(0);
             }
         });
     }

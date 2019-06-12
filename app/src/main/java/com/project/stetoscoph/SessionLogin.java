@@ -30,6 +30,15 @@ public class SessionLogin {
         editor.commit();
     }
 
+    public void deleteUserLoginSession() {
+        editor.clear();
+        editor.commit();
+
+        Intent i = new Intent(c, MainActivity.class);
+        c.startActivity(i);
+
+    }
+
     public boolean checkLogin() {
 
         if (!this.isUserLoggedIn()) {
