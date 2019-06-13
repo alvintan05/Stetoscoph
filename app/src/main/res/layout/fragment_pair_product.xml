@@ -7,32 +7,92 @@
     tools:context=".PairProductFragment">
 
     <ImageView
-        android:padding="10dp"
-        android:background="@drawable/bg_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="50dp"
+        android:background="@drawable/bg_image"
+        android:padding="10dp"
         android:src="@drawable/ic_bluetooth" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Bluetooth:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/bluetoothStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.9"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Not Connected" />
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/btn_bluetooth_on"
-        android:layout_marginTop="30dp"
-        android:layout_width="100dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
         android:background="@color/colorPrimary"
         android:text="Turn On"
         android:textColor="@android:color/white" />
 
     <Button
         android:id="@+id/btn_bluetooth_off"
-        android:layout_marginTop="20dp"
-        android:layout_width="100dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
         android:background="@color/colorPrimary"
         android:text="Turn Off"
+        android:textColor="@android:color/white"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btn_show_pair"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:background="@color/colorPrimary"
+        android:text="Show Paired Devices"
         android:textColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/btn_discover"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:background="@color/colorPrimary"
+        android:text="Discover New Devices"
+        android:textColor="@android:color/white" />
+
+    <ListView
+        android:id="@+id/devicesListView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
+        android:choiceMode="singleChoice" />
+
 
 </LinearLayout>

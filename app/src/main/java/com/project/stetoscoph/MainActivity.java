@@ -1,9 +1,13 @@
 package com.project.stetoscoph;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -30,6 +34,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         edtCode = (EditText) findViewById(R.id.edt_code);
         edtUsername = (EditText) findViewById(R.id.edt_username);
         textInputLayout = (TextInputLayout) findViewById(R.id.text_input_code);
+
+        // Ask for location permission if not already allowed
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
 
         session = new SessionLogin(getApplicationContext());
 
