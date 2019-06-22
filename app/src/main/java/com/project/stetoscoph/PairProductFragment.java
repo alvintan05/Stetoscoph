@@ -207,6 +207,7 @@ public class PairProductFragment extends Fragment {
         // Check if the device is already discovering
         if (btAdapter.isDiscovering()) {
             btAdapter.cancelDiscovery();
+            getActivity().unregisterReceiver(blReceiver);
             Toast.makeText(getContext(), "Discovery Stopped", Toast.LENGTH_SHORT).show();
         } else {
             if (btAdapter.isEnabled()) {
@@ -263,7 +264,7 @@ public class PairProductFragment extends Fragment {
                         BluetoothDevice device = btAdapter.getRemoteDevice(address);
 
                         try {
-                            mBTSocket = createBluetoothSocket(device);
+                            mBTSocket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
                         } catch (IOException e) {
                             fail = true;
                             Toast.makeText(getActivity().getBaseContext(), "Socket Creation Failed", Toast.LENGTH_SHORT).show();
@@ -295,15 +296,15 @@ public class PairProductFragment extends Fragment {
         };
     }
 
-    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
-        try {
-            final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);
-            return (BluetoothSocket) m.invoke(device, BTMODULEUUID);
-        } catch (Exception e) {
-            Log.e(TAG, "Could not create Insecure RFComm Connection", e);
-        }
-        return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
-    }
+//    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
+//        try {
+//            final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);
+//            return (BluetoothSocket) m.invoke(device, BTMODULEUUID);
+//        } catch (Exception e) {
+//            Log.e(TAG, "Could not create Insecure RFComm Connection", e);
+//        }
+//        return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
+//    }
 
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;

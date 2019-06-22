@@ -11,7 +11,9 @@ public class SessionLogin {
     private static final String PREFERENCES_NAME = "MyPrefs";
     public static final String USERNAME_KEY = "usernameKey";
     public static final String CODE_KEY = "codeKey";
+    public static final String PASSWORD_KEY = "passwordKey";
     private static final String IS_USER_LOGIN = "UserLogin";
+    private static final String IS_PASSWORD_ENABLED = "PasswordEnabled";
 
     SharedPreferences pref;
     SharedPreferences.Editor editor;
@@ -25,18 +27,31 @@ public class SessionLogin {
 
     public void createUserLoginSession(String username, String code) {
         editor.putBoolean(IS_USER_LOGIN, true);
+        editor.putBoolean(IS_PASSWORD_ENABLED, false);
         editor.putString(USERNAME_KEY, username);
         editor.putString(CODE_KEY, code);
-        editor.commit();
+        editor.apply();
+    }
+
+    public void createUserPasswordSession(String password) {
+        editor.putBoolean(IS_PASSWORD_ENABLED, true);
+        editor.putString(PASSWORD_KEY, password);
+        editor.apply();
     }
 
     public void deleteUserLoginSession() {
         editor.clear();
-        editor.commit();
+        editor.apply();
 
         Intent i = new Intent(c, MainActivity.class);
         c.startActivity(i);
 
+    }
+
+    public void deleteUserPasswordSession() {
+        editor.remove(PASSWORD_KEY);
+        editor.putBoolean(IS_PASSWORD_ENABLED, false);
+        editor.apply();
     }
 
     public boolean checkLogin() {
@@ -53,8 +68,36 @@ public class SessionLogin {
         return false;
     }
 
+    public boolean checkPasswordEnter() {
+        if (this.isPasswordEnabled()) {
+            Intent i = new Intent(c, PasswordLockScreenActivity.class);
+            c.startActivity(i);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean checkPassword(String password) {
+        if (this.isPasswordEnabled()) {
+            String pw = pref.getString(PASSWORD_KEY, "");
+            if (pw.equals(password)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // Check for login
     public boolean isUserLoggedIn() {
         return pref.getBoolean(IS_USER_LOGIN, false);
     }
+
+    // Check for password
+    public boolean isPasswordEnabled() {
+        return pref.getBoolean(IS_PASSWORD_ENABLED, false);
+    }
+
 }

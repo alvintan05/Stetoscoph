@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ToggleButton;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
@@ -47,10 +48,11 @@ public class GraphFragment extends Fragment {
 
         //init(v);
 
+        initGraph(graph);
+
         tbStream.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                initGraph(graph);
                 mTimer = new Runnable() {
                     @Override
                     public void run() {
@@ -80,6 +82,9 @@ public class GraphFragment extends Fragment {
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinY(-100);
         graph.getViewport().setMaxY(100);
+
+        graph.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.NONE);
+        graph.getViewport().setDrawBorder(false);
 
         // first mSeries is a line
         mSeries = new LineGraphSeries<>();

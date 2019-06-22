@@ -44,6 +44,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         if (session.checkLogin())
             finish();
 
+        if (session.checkPasswordEnter()) finish();
+
         if (savedInstanceState == null) {
             Fragment currentFragment = new PairProductFragment();
             getSupportFragmentManager()
