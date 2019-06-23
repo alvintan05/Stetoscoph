@@ -14,6 +14,7 @@ public class SessionLogin {
     public static final String PASSWORD_KEY = "passwordKey";
     private static final String IS_USER_LOGIN = "UserLogin";
     private static final String IS_PASSWORD_ENABLED = "PasswordEnabled";
+    private static final String IS_PASSWORD_ENTERED = "PasswordEntered";
 
     SharedPreferences pref;
     SharedPreferences.Editor editor;
@@ -35,7 +36,18 @@ public class SessionLogin {
 
     public void createUserPasswordSession(String password) {
         editor.putBoolean(IS_PASSWORD_ENABLED, true);
+        editor.putBoolean(IS_PASSWORD_ENTERED, true);
         editor.putString(PASSWORD_KEY, password);
+        editor.apply();
+    }
+
+    public void passwordEntered() {
+        editor.putBoolean(IS_PASSWORD_ENTERED, true);
+        editor.apply();
+    }
+
+    public void passwordOut() {
+        editor.putBoolean(IS_PASSWORD_ENTERED, false);
         editor.apply();
     }
 
@@ -69,8 +81,10 @@ public class SessionLogin {
     }
 
     public boolean checkPasswordEnter() {
-        if (this.isPasswordEnabled()) {
+        if (this.isPasswordEnabled() && !this.isPasswordEntered()) {
             Intent i = new Intent(c, PasswordLockScreenActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             c.startActivity(i);
 
             return true;
@@ -100,4 +114,8 @@ public class SessionLogin {
         return pref.getBoolean(IS_PASSWORD_ENABLED, false);
     }
 
+    // Check for password enter
+    public boolean isPasswordEntered() {
+        return pref.getBoolean(IS_PASSWORD_ENTERED, false);
+    }
 }

@@ -44,7 +44,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         if (session.checkLogin())
             finish();
 
-        if (session.checkPasswordEnter()) finish();
+        if (session.checkPasswordEnter()) {
+            finish();
+        }
 
         if (savedInstanceState == null) {
             Fragment currentFragment = new PairProductFragment();
@@ -114,5 +116,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.closeDrawer(GravityCompat.START);
 
         return true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        session.passwordOut();
     }
 }

@@ -34,6 +34,7 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
 
                 if (session.checkPassword(pw)) {
                     startActivity(new Intent(PasswordLockScreenActivity.this, HomeActivity.class));
+                    session.passwordEntered();
                     Toast.makeText(PasswordLockScreenActivity.this, "Password Correct", Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
