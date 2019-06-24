@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,8 +26,6 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.UUID;
 
@@ -295,16 +292,6 @@ public class PairProductFragment extends Fragment {
             }
         };
     }
-
-//    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
-//        try {
-//            final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);
-//            return (BluetoothSocket) m.invoke(device, BTMODULEUUID);
-//        } catch (Exception e) {
-//            Log.e(TAG, "Could not create Insecure RFComm Connection", e);
-//        }
-//        return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
-//    }
 
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
