@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.jjoe64.graphview.GraphView;
@@ -30,6 +31,7 @@ public class GraphFragment extends Fragment implements Bluetooth.CommunicationCa
 
     //graph init
     static GraphView graphView;
+    TextView tvFrekuensi;
     GraphView graph;
     static LineGraphSeries series;
     private static double graph2LastXValue = 0;
@@ -63,6 +65,7 @@ public class GraphFragment extends Fragment implements Bluetooth.CommunicationCa
         graph = (GraphView) v.findViewById(R.id.graph);
         btnStartStream = (Button) v.findViewById(R.id.btn_start_stream);
         btnStopStream = (Button) v.findViewById(R.id.btn_stop_stream);
+        tvFrekuensi = (TextView) v.findViewById(R.id.tv_frekuensi);
 
         //init(v);
 
@@ -94,6 +97,7 @@ public class GraphFragment extends Fragment implements Bluetooth.CommunicationCa
             @Override
             public void onClick(View v) {
                 mHandler.removeCallbacks(mTimer);
+//                mSeries.resetData(new DataPoint[]);
             }
         });
 
@@ -145,6 +149,7 @@ public class GraphFragment extends Fragment implements Bluetooth.CommunicationCa
     public void onMessage(String message) {
         Double value = Double.parseDouble(message);
         mSeries.appendData(new DataPoint(graphLastXValue, value), false, 50);
+        tvFrekuensi.setText(message);
     }
 
     @Override
