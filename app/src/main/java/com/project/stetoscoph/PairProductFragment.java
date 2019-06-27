@@ -78,6 +78,10 @@ public class PairProductFragment extends Fragment {
                     else
                         tvStatus.setText("Connection Failed");
                 }
+
+                if (msg.what == MESSAGE_READ) {
+                    tvStatus.setText(msg.obj.toString());
+                }
             }
         };
     }
@@ -182,6 +186,7 @@ public class PairProductFragment extends Fragment {
         btnOff.setVisibility(View.GONE);
         btnOn.setVisibility(View.VISIBLE);
         btAdapter.disable(); // turn off
+
         tvStatus.setText("Off");
         Toast.makeText(getActivity(), "Bluetooth Turned Off", Toast.LENGTH_SHORT).show();
         mBTArrayAdapter.clear();
@@ -296,16 +301,6 @@ public class PairProductFragment extends Fragment {
         };
     }
 
-//    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
-//        try {
-//            final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);
-//            return (BluetoothSocket) m.invoke(device, BTMODULEUUID);
-//        } catch (Exception e) {
-//            Log.e(TAG, "Could not create Insecure RFComm Connection", e);
-//        }
-//        return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
-//    }
-
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
@@ -330,40 +325,31 @@ public class PairProductFragment extends Fragment {
         }
 
         public void run() {
-            byte[] buffer;  // buffer store for the stream
+            byte[] buffer = new byte[1024];  // buffer store for the stream
             int bytes; // bytes returned from read()
             // Keep listening to the InputStream until an exception occurs
             while (true) {
                 try {
-                    // Read from the InputStream
-                    bytes = mmInStream.available();
-                    if (bytes >= 0) {
-                        buffer = new byte[1024];
-                        Thread.sleep(1000, 500000);
-                        bytes = mmInStream.available(); // how many bytes are ready to be read?
-                        bytes = mmInStream.read(buffer, 0, bytes); // record how many bytes we actually read
-                        mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-                                .sendToTarget(); // Send the obtained bytes to the UI activity
-                    }
+                    bytes = mmInStream.read(buffer);
+                    final String incomingMessage = new String(buffer, 0 , bytes);
+                    sleep(1000);
+                    Log.d(TAG, "InputStream: " + incomingMessage);
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            tvStatus.setText(incomingMessage);
+                        }
+                    });
 
                 } catch (IOException e) {
                     e.printStackTrace();
-
                     break;
-                } catch (InterruptedException e) {
+                } catch (InterruptedException e){
                     e.printStackTrace();
+                    break;
                 }
 
-            }
-        }
-
-
-        /* Call this from the main activity to send data to the remote device */
-        public void write(String input) {
-            byte[] bytes = input.getBytes();           //converts entered String into bytes
-            try {
-                mmOutStream.write(bytes);
-            } catch (IOException e) {
             }
         }
 
