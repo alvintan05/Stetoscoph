@@ -18,7 +18,7 @@
 
         <TextView
             android:id="@+id/tv_title_frekuensi"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/graph"
             android:layout_marginTop="10dp"
@@ -37,6 +37,34 @@
             android:paddingRight="20dp"
             android:paddingBottom="10dp"
             android:text="150 Hz" />
+
+        <TextView
+            android:id="@+id/tv_title_klasifikasi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/graph"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"
+            android:text="@string/klasifikasi_jantung"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_klasifikasi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_title_klasifikasi"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/bg_text"
+            android:paddingLeft="20dp"
+            android:paddingTop="10dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="10dp"
+            android:text="Normal" />
 
         <TextView
             android:id="@+id/tv_title_bit"
@@ -86,40 +114,23 @@
             android:paddingBottom="10dp"
             android:src="@drawable/ic_save" />
 
-        <TextView
-            android:id="@+id/tv_title_klasifikasi"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/btn_start_stream"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_bit"
             android:layout_marginTop="10dp"
-            android:gravity="center_horizontal"
-            android:text="@string/klasifikasi_jantung"
-            android:textSize="16sp" />
+            android:padding="20dp"
+            android:text="Start Stream" />
 
-        <TextView
-            android:id="@+id/tv_klasifikasi"
+        <Button
+            android:id="@+id/btn_stop_stream"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_title_klasifikasi"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/bg_text"
-            android:paddingLeft="20dp"
-            android:paddingTop="10dp"
-            android:paddingRight="20dp"
-            android:paddingBottom="10dp"
-            android:text="Normal" />
-
-        <ToggleButton
-            android:id="@+id/tb_stream"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_klasifikasi"
-            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/btn_start_stream"
             android:layout_marginTop="10dp"
             android:padding="20dp"
-            android:textOff="Start Stream"
-            android:textOn="Stop Stream" />
+            android:text="Stop Stream" />
 
     </RelativeLayout>
 

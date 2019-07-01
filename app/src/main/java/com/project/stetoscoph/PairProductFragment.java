@@ -9,11 +9,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
@@ -48,14 +45,15 @@ public class PairProductFragment extends Fragment {
     ListView listView;
 
     // Bluetooth Stuff
+    BluetoothManager btManager;
     BluetoothAdapter btAdapter;
     Set<BluetoothDevice> mPairedDevices;
     ArrayAdapter<String> mBTArrayAdapter;
+    ArrayList<BluetoothDevice> mBTDevicesList = new ArrayList<>();
 
     private Handler mHandler; // Our main handler that will receive callback notifications
     private BluetoothSocket mBTSocket = null; // bi-directional client-to-client data path
-    private ConnectedThread mConnectedThread; // bluetooth background worker thread to send and receive data
-    private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // "random" unique identifier
+    /*private ConnectedThread mConnectedThread; // bluetooth background worker thread to send and receive data*/
 
     // defines for identifying shared types between calling functions
     private final static int REQUEST_ENABLE_BT = 1; // used to identify adding bluetooth names
@@ -70,20 +68,20 @@ public class PairProductFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mHandler = new Handler() {
-            public void handleMessage(android.os.Message msg) {
-                if (msg.what == CONNECTING_STATUS) {
-                    if (msg.arg1 == 1)
-                        tvStatus.setText("Connected to Device: " + (msg.obj));
-                    else
-                        tvStatus.setText("Connection Failed");
-                }
-
-                if (msg.what == MESSAGE_READ) {
-                    tvStatus.setText(msg.obj.toString());
-                }
-            }
-        };
+//        mHandler = new Handler() {
+//            public void handleMessage(android.os.Message msg) {
+//                if (msg.what == CONNECTING_STATUS) {
+//                    if (msg.arg1 == 1)
+//                        tvStatus.setText("Connected to Device: " + (msg.obj));
+//                    else
+//                        tvStatus.setText("Connection Failed");
+//                }
+//
+//                if (msg.what == MESSAGE_READ) {
+//                    tvStatus.setText(msg.obj.toString());
+//                }
+//            }
+//        };
     }
 
     @Override
@@ -99,6 +97,7 @@ public class PairProductFragment extends Fragment {
         btnDiscover = (Button) v.findViewById(R.id.btn_discover);
         tvStatus = (TextView) v.findViewById(R.id.bluetoothStatus);
         listView = (ListView) v.findViewById(R.id.devicesListView);
+        btManager = BluetoothManager.getInstance();
 
         mBTArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1);
         btAdapter = BluetoothAdapter.getDefaultAdapter(); // get a handle on the bluetooth radio
@@ -197,11 +196,14 @@ public class PairProductFragment extends Fragment {
         if (btAdapter.isDiscovering()) {
             btAdapter.cancelDiscovery();
         }
+        mBTDevicesList.clear();
         mBTArrayAdapter.clear();
         if (btAdapter.isEnabled()) {
             // put it's one to the adapter
-            for (BluetoothDevice device : mPairedDevices)
+            for (BluetoothDevice device : mPairedDevices) {
+                mBTDevicesList.add(device);
                 mBTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+            }
 
             Toast.makeText(getActivity(), "Show Paired Devices", Toast.LENGTH_SHORT).show();
         } else
@@ -212,23 +214,24 @@ public class PairProductFragment extends Fragment {
         // Check if the device is already discovering
         if (btAdapter.isDiscovering()) {
             btAdapter.cancelDiscovery();
-            getActivity().unregisterReceiver(blReceiver);
+            getActivity().unregisterReceiver(discoverReceiver);
             Toast.makeText(getContext(), "Discovery Stopped", Toast.LENGTH_SHORT).show();
         } else {
             if (btAdapter.isEnabled()) {
+                mBTDevicesList.clear();
                 mBTArrayAdapter.clear(); // clear items
                 btAdapter.startDiscovery();
                 Toast.makeText(getContext(), "Discovery Started", Toast.LENGTH_SHORT).show();
 
                 IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-                getActivity().registerReceiver(blReceiver, filter);
+                getActivity().registerReceiver(discoverReceiver, filter);
             } else {
                 Toast.makeText(getContext(), "Bluetooth Not On", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private final BroadcastReceiver blReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver discoverReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -238,6 +241,7 @@ public class PairProductFragment extends Fragment {
                 String name = device.getName();
                 if (name == null)
                     name = "Unnamed Device";
+                mBTDevicesList.add(device);
                 mBTArrayAdapter.add(name + "\n" + device.getAddress());
                 mBTArrayAdapter.notifyDataSetChanged();
             }
@@ -255,18 +259,41 @@ public class PairProductFragment extends Fragment {
                     return;
                 }
 
-                tvStatus.setText("Connecting...");
+                btAdapter.cancelDiscovery();
+
+                try {
+                    getActivity().unregisterReceiver(discoverReceiver);
+                } catch (Exception e) {
+                    e.getMessage();
+                }
+
+                tvStatus.setText("Connecting");
+                final String deviceName = mBTDevicesList.get(arg2).getName();
+                final String deviceAddress = mBTDevicesList.get(arg2).getAddress();
+
+                btManager.setBtDevice(mBTDevicesList.get(arg2));
+
+                if (btManager.getBtDevice() != null) {
+                    Toast.makeText(getActivity(), btManager.getBtDevice().getName() + "\n" + btManager.getBtDevice().getAddress(), Toast.LENGTH_SHORT).show();
+                    tvStatus.setText("Pindah ke halaman graph");
+                }
+
+//                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2){
+//                    Toast.makeText(getActivity(), "Trying to pair with " + deviceName, Toast.LENGTH_SHORT).show();
+//                    mBTDevicesList.get(arg2).createBond();
+//                }
+
                 // Get the device MAC address, which is the last 17 chars in the View
-                String info = ((TextView) v).getText().toString();
-                final String address = info.substring(info.length() - 17);
-                final String name = info.substring(0, info.length() - 17);
+//                String info = ((TextView) v).getText().toString();
+//                final String address = info.substring(info.length() - 17);
+//                final String name = info.substring(0, info.length() - 17);
 
                 // Spawn a new thread to avoid blocking the GUI one
-                new Thread() {
+                /*new Thread() {
                     public void run() {
                         boolean fail = false;
 
-                        BluetoothDevice device = btAdapter.getRemoteDevice(address);
+                        BluetoothDevice device = btAdapter.getRemoteDevice(deviceAddress);
 
                         try {
                             mBTSocket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
@@ -289,19 +316,19 @@ public class PairProductFragment extends Fragment {
                             }
                         }
                         if (!fail) {
-                            mConnectedThread = new ConnectedThread(mBTSocket);
-                            mConnectedThread.start();
+//                            mConnectedThread = new ConnectedThread(mBTSocket);
+//                            mConnectedThread.start();
 
-                            mHandler.obtainMessage(CONNECTING_STATUS, 1, -1, name)
+                            mHandler.obtainMessage(CONNECTING_STATUS, 1, -1, deviceName)
                                     .sendToTarget();
                         }
                     }
-                }.start();
+                }.start();*/
             }
         };
     }
 
-    private class ConnectedThread extends Thread {
+    /*private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
@@ -353,13 +380,13 @@ public class PairProductFragment extends Fragment {
             }
         }
 
-        /* Call this from the main activity to shutdown the connection */
+        *//* Call this from the main activity to shutdown the connection *//*
         public void cancel() {
             try {
                 mmSocket.close();
             } catch (IOException e) {
             }
         }
-    }
+    }*/
 
 }
