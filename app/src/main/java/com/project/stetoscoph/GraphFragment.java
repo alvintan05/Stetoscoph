@@ -1,27 +1,38 @@
 package com.project.stetoscoph;
 
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
+import com.google.gson.Gson;
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.LegendRenderer;
+import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.jjoe64.graphview.series.Series;
+import com.project.stetoscoph.database.DMLHelper;
+import com.project.stetoscoph.entity.Data;
 
-import java.util.Random;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.UUID;
 
 
 /**
@@ -29,18 +40,27 @@ import java.util.Random;
  */
 public class GraphFragment extends Fragment {
 
-    ToggleButton tbStream;
+    Button btnStart, btnStop;
+    TextView tvFrekuensi;
+    ImageButton imgBtnSave;
 
-    //graph init
-    static GraphView graphView;
-    static LineGraphSeries series;
-    private static double graph2LastXValue = 0;
-    private static int Xview = 10;
+    private static final String TAG = "GraphFragment";
 
-    private final Handler mHandler = new Handler();
-    private Runnable mTimer;
-    private double graphLastXValue = 5d;
+    private double graphLastXValue = 0d;
+    double graphYValue = 0;
     private LineGraphSeries<DataPoint> mSeries;
+    private ArrayList<Double> dataArray = new ArrayList<>();
+
+
+    // Bluetooth Stuff
+    BluetoothManager btManager;
+    BluetoothSocket mBTSocket;
+    public ConnectThread connectThread = new ConnectThread();
+    public ConnectedThread mConnectedThread;
+
+    DMLHelper dmlHelper;
+    Data data;
+    SessionSharedPreference session;
 
     public GraphFragment() {
         // Required empty public constructor
@@ -53,60 +73,213 @@ public class GraphFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_graph, container, false);
 
         final GraphView graph = (GraphView) v.findViewById(R.id.graph);
-        tbStream = (ToggleButton) v.findViewById(R.id.tb_stream);
+        btnStart = (Button) v.findViewById(R.id.btn_start_stream);
+        btnStop = (Button) v.findViewById(R.id.btn_stop_stream);
+        tvFrekuensi = (TextView) v.findViewById(R.id.tv_frekuensi);
+        imgBtnSave = (ImageButton) v.findViewById(R.id.img_btn_save);
+        btManager = BluetoothManager.getInstance();
+        dmlHelper = DMLHelper.getInstance(getActivity());
+        session = new SessionSharedPreference(getActivity());
 
         //init(v);
 
-        tbStream.setOnClickListener(new View.OnClickListener() {
+        initGraph(graph);
+
+        btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                initGraph(graph);
-                mTimer = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (graphLastXValue == 40) {
-                            graphLastXValue = 0;
-                            mSeries.resetData(new DataPoint[] {
-                                    new DataPoint(graphLastXValue, getRandom())
-                            });
-                        }
-                        graphLastXValue += 1d;
-                        mSeries.appendData(new DataPoint(graphLastXValue, getRandom()), false, 40);
-                        mHandler.postDelayed(this, 50);
-                    }
-                };
-                mHandler.postDelayed(mTimer, 700);
+                connectThread.run();
+            }
+        });
+
+        btnStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    mConnectedThread.cancel();
+                    mSeries.resetData(new DataPoint[]{
+                            new DataPoint(graphLastXValue, graphYValue)
+                    });
+                    dataArray.clear();
+                } catch (Exception e) {
+                    e.getMessage();
+                }
+            }
+        });
+
+        imgBtnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dmlHelper.open();
+                data = new Data();
+                String date = getDateId();
+
+                data.setTime(date);
+                data.setTitle(session.getUserName());
+
+                String convert = convertArray(dataArray);
+
+                data.setData(convert);
+
+                long result = dmlHelper.insertData(data);
+
+                if (result > 0) {
+                    Toast.makeText(getActivity(), "Data berhasil ditambahkan", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Data gagal ditambahkan", Toast.LENGTH_SHORT).show();
+                }
+
+                dmlHelper.close();
             }
         });
 
         return v;
     }
 
-    private void initGraph(GraphView graph){
+    private void initGraph(GraphView graph) {
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(0);
         graph.getViewport().setMaxX(40);
 
         graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(-100);
-        graph.getViewport().setMaxY(100);
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(200);
 
-        // first mSeries is a line
+        graph.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.NONE);
+        graph.getGridLabelRenderer().setHorizontalLabelsVisible(false);
+        graph.getGridLabelRenderer().setVerticalLabelsVisible(false);
+
+        graph.getViewport().setDrawBorder(false);
+
         mSeries = new LineGraphSeries<>();
         graph.addSeries(mSeries);
     }
 
+    public class ConnectThread extends Thread {
+        public void run() {
+            boolean fail = false;
+
+            BluetoothDevice device = btManager.getBtDevice();
+
+            try {
+                mBTSocket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
+            } catch (IOException e) {
+                fail = true;
+                Toast.makeText(getActivity(), "Socket Creation Failed", Toast.LENGTH_SHORT).show();
+            }
+            // Establish the Bluetooth socket connection.
+            try {
+                mBTSocket.connect();
+            } catch (IOException e) {
+                try {
+                    fail = true;
+                    mBTSocket.close();
+                } catch (IOException e2) {
+                    //insert code to deal with this
+                    Toast.makeText(getActivity(), "Socket Creation Failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+            if (!fail) {
+                mConnectedThread = new ConnectedThread(mBTSocket);
+                mConnectedThread.start();
+                Toast.makeText(getActivity(), "Mulai menerima data", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+    private class ConnectedThread extends Thread {
+        private final BluetoothSocket mmSocket;
+        private final InputStream mmInStream;
+
+        public ConnectedThread(BluetoothSocket socket) {
+            mmSocket = socket;
+            InputStream tmpIn = null;
+
+            // Get the input and output streams, using temp objects because
+            // member streams are final
+            try {
+                tmpIn = socket.getInputStream();
+            } catch (IOException e) {
+            }
+
+            mmInStream = tmpIn;
+        }
+
+        public void run() {
+            byte[] buffer = new byte[1024];  // buffer store for the stream
+            int bytes; // bytes returned from read()
+            // Keep listening to the InputStream until an exception occurs
+            while (true) {
+                try {
+                    sleep(1000);
+                    bytes = mmInStream.read(buffer);
+                    final String incomingMessage = new String(buffer, 0, bytes);
+                    Log.d(TAG, "InputStream: " + incomingMessage);
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (incomingMessage != null) {
+                                graphYValue = Double.parseDouble(incomingMessage);
+                            } else {
+                                graphYValue = 0;
+                            }
+
+                            if (graphLastXValue == 40) {
+                                graphLastXValue = 0;
+                                mSeries.resetData(new DataPoint[]{
+                                        new DataPoint(graphLastXValue, graphYValue)
+                                });
+                            }
+                            graphLastXValue += 1d;
+                            dataArray.add(graphYValue);
+                            mSeries.appendData(new DataPoint(graphLastXValue, graphYValue), false, 40);
+                            tvFrekuensi.setText(incomingMessage + " hz");
+                        }
+                    });
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    break;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    break;
+                }
+
+            }
+        }
+
+        //* Call this from the main activity to shutdown the connection *//*
+        public void cancel() {
+            try {
+                mmSocket.close();
+            } catch (IOException e) {
+            }
+        }
+    }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        mHandler.removeCallbacks(mTimer);
+    public void onDestroy() {
+        super.onDestroy();
+        try {
+            mConnectedThread.cancel();
+        } catch (Exception e) {
+            e.getMessage();
+        }
     }
 
-    double mLastRandom = 2;
-    private double getRandom() {
-        mLastRandom++;
-        return Math.sin(mLastRandom*0.5) * 10 * (Math.random() * 10 + 1);
+    @NonNull
+    private String getDateId() {
+        Date currentDate = Calendar.getInstance().getTime();
+
+        DateFormat format = new SimpleDateFormat("yyy/MM/dd/kk:mm:ss", Locale.US);
+
+        return format.format(currentDate);
     }
 
+    private String convertArray(ArrayList<Double> arrayList) {
+        Gson gson = new Gson();
+        return gson.toJson(arrayList);
+    }
 }

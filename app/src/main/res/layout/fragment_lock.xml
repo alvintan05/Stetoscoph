@@ -1,14 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center_horizontal"
     tools:context=".LockFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Password Status : " />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/tv_pw_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/status"
+        android:layout_toRightOf="@+id/status"
+        android:text="Not Active" />
+
+    <Button
+        android:id="@+id/btn_set_pw"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/status"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Set Password" />
+
+    <Button
+        android:id="@+id/btn_change_pw"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_set_pw"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Change Password" />
+
+</RelativeLayout>

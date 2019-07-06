@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
@@ -13,16 +14,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ReportDetailActivity"></activity>
+        <activity android:name=".PasswordLockScreenActivity" />
+        <activity android:name=".ChangePasswordActivity" />
+        <activity android:name=".PasswordActivity" />
         <activity
             android:name=".HomeActivity"
-            android:theme="@style/NoToolbar" />
-        <activity android:name=".MainActivity">
+            android:theme="@style/NoToolbar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

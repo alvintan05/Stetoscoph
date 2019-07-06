@@ -56,15 +56,15 @@
                 android:padding="16dp">
 
                 <TextView
-                    android:drawableLeft="@drawable/ic_exit"
-                    android:drawableStart="@drawable/ic_exit"
-                    android:drawablePadding="38dp"
-                    android:textSize="12sp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_exit"
+                    android:drawableLeft="@drawable/ic_exit"
+                    android:drawablePadding="38dp"
                     android:gravity="center|start"
+                    android:text="Log Out"
                     android:textColor="@color/colorPrimary"
-                    android:text="Exit" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
         </android.support.design.widget.NavigationView>

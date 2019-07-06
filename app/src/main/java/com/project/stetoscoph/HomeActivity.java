@@ -22,6 +22,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     Toolbar toolbar;
     LinearLayout exit;
 
+    SessionSharedPreference session;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +39,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setCheckedItem(R.id.menu_pairing);
         navigationView.setNavigationItemSelectedListener(this);
 
+        session = new SessionSharedPreference(getApplicationContext());
+
+        if (session.checkLogin())
+            finish();
+
+        if (session.checkPasswordEnter()) {
+            finish();
+        }
+
         if (savedInstanceState == null) {
             Fragment currentFragment = new PairProductFragment();
             getSupportFragmentManager()
@@ -48,9 +59,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(HomeActivity.this, "Exit", Toast.LENGTH_SHORT).show();
+                Toast.makeText(HomeActivity.this, "Log Out", Toast.LENGTH_SHORT).show();
+                session.deleteUserLoginSession();
                 finish();
-                System.exit(0);
             }
         });
     }
@@ -105,5 +116,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.closeDrawer(GravityCompat.START);
 
         return true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        session.passwordOut();
     }
 }
