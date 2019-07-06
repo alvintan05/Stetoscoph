@@ -1,18 +1,13 @@
 package com.project.stetoscoph;
 
 
-import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,10 +19,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -36,8 +29,6 @@ import static android.app.Activity.RESULT_OK;
  * A simple {@link Fragment} subclass.
  */
 public class PairProductFragment extends Fragment {
-
-    private static final String TAG = "PairProductFragment";
 
     // widget
     Button btnOn, btnOff, btnPair, btnDiscover;
@@ -51,37 +42,11 @@ public class PairProductFragment extends Fragment {
     ArrayAdapter<String> mBTArrayAdapter;
     ArrayList<BluetoothDevice> mBTDevicesList = new ArrayList<>();
 
-    private Handler mHandler; // Our main handler that will receive callback notifications
-    private BluetoothSocket mBTSocket = null; // bi-directional client-to-client data path
-    /*private ConnectedThread mConnectedThread; // bluetooth background worker thread to send and receive data*/
-
     // defines for identifying shared types between calling functions
     private final static int REQUEST_ENABLE_BT = 1; // used to identify adding bluetooth names
-    private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
-    private final static int CONNECTING_STATUS = 3; // used in bluetooth handler to identify message status
 
     public PairProductFragment() {
         // Required empty public constructor
-    }
-
-    @SuppressLint("HandlerLeak")
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-//        mHandler = new Handler() {
-//            public void handleMessage(android.os.Message msg) {
-//                if (msg.what == CONNECTING_STATUS) {
-//                    if (msg.arg1 == 1)
-//                        tvStatus.setText("Connected to Device: " + (msg.obj));
-//                    else
-//                        tvStatus.setText("Connection Failed");
-//                }
-//
-//                if (msg.what == MESSAGE_READ) {
-//                    tvStatus.setText(msg.obj.toString());
-//                }
-//            }
-//        };
     }
 
     @Override
@@ -122,11 +87,11 @@ public class PairProductFragment extends Fragment {
             Toast.makeText(getActivity().getApplicationContext(), "Bluetooth Device Not Found!", Toast.LENGTH_SHORT).show();
         } else {
             // if device support bluetooth
+
             // click
             btnOn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Toast.makeText(getActivity(), "Turning On Bluetooth", Toast.LENGTH_SHORT).show();
                     turnOnBT();
                 }
             });
@@ -134,7 +99,6 @@ public class PairProductFragment extends Fragment {
             btnOff.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Toast.makeText(getActivity(), "Turning Off Bluetooth", Toast.LENGTH_SHORT).show();
                     turnOffBT();
                 }
             });
@@ -173,8 +137,6 @@ public class PairProductFragment extends Fragment {
         if (requestCode == REQUEST_ENABLE_BT) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                // The user picked a contact.
-                // The Intent's data Uri identifies which contact was selected.
                 tvStatus.setText("On");
             } else
                 tvStatus.setText("Off");
@@ -184,6 +146,7 @@ public class PairProductFragment extends Fragment {
     private void turnOffBT() {
         btnOff.setVisibility(View.GONE);
         btnOn.setVisibility(View.VISIBLE);
+
         btAdapter.disable(); // turn off
 
         tvStatus.setText("Off");
@@ -268,8 +231,6 @@ public class PairProductFragment extends Fragment {
                 }
 
                 tvStatus.setText("Connecting");
-                final String deviceName = mBTDevicesList.get(arg2).getName();
-                final String deviceAddress = mBTDevicesList.get(arg2).getAddress();
 
                 btManager.setBtDevice(mBTDevicesList.get(arg2));
 
@@ -277,116 +238,7 @@ public class PairProductFragment extends Fragment {
                     Toast.makeText(getActivity(), btManager.getBtDevice().getName() + "\n" + btManager.getBtDevice().getAddress(), Toast.LENGTH_SHORT).show();
                     tvStatus.setText("Pindah ke halaman graph");
                 }
-
-//                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2){
-//                    Toast.makeText(getActivity(), "Trying to pair with " + deviceName, Toast.LENGTH_SHORT).show();
-//                    mBTDevicesList.get(arg2).createBond();
-//                }
-
-                // Get the device MAC address, which is the last 17 chars in the View
-//                String info = ((TextView) v).getText().toString();
-//                final String address = info.substring(info.length() - 17);
-//                final String name = info.substring(0, info.length() - 17);
-
-                // Spawn a new thread to avoid blocking the GUI one
-                /*new Thread() {
-                    public void run() {
-                        boolean fail = false;
-
-                        BluetoothDevice device = btAdapter.getRemoteDevice(deviceAddress);
-
-                        try {
-                            mBTSocket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
-                        } catch (IOException e) {
-                            fail = true;
-                            Toast.makeText(getActivity().getBaseContext(), "Socket Creation Failed", Toast.LENGTH_SHORT).show();
-                        }
-                        // Establish the Bluetooth socket connection.
-                        try {
-                            mBTSocket.connect();
-                        } catch (IOException e) {
-                            try {
-                                fail = true;
-                                mBTSocket.close();
-                                mHandler.obtainMessage(CONNECTING_STATUS, -1, -1)
-                                        .sendToTarget();
-                            } catch (IOException e2) {
-                                //insert code to deal with this
-                                Toast.makeText(getActivity().getBaseContext(), "Socket Creation Failed", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        if (!fail) {
-//                            mConnectedThread = new ConnectedThread(mBTSocket);
-//                            mConnectedThread.start();
-
-                            mHandler.obtainMessage(CONNECTING_STATUS, 1, -1, deviceName)
-                                    .sendToTarget();
-                        }
-                    }
-                }.start();*/
             }
         };
     }
-
-    /*private class ConnectedThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
-
-        public ConnectedThread(BluetoothSocket socket) {
-            mmSocket = socket;
-            InputStream tmpIn = null;
-            OutputStream tmpOut = null;
-
-            // Get the input and output streams, using temp objects because
-            // member streams are final
-            try {
-                tmpIn = socket.getInputStream();
-                tmpOut = socket.getOutputStream();
-            } catch (IOException e) {
-            }
-
-            mmInStream = tmpIn;
-            mmOutStream = tmpOut;
-
-        }
-
-        public void run() {
-            byte[] buffer = new byte[1024];  // buffer store for the stream
-            int bytes; // bytes returned from read()
-            // Keep listening to the InputStream until an exception occurs
-            while (true) {
-                try {
-                    bytes = mmInStream.read(buffer);
-                    final String incomingMessage = new String(buffer, 0 , bytes);
-                    sleep(1000);
-                    Log.d(TAG, "InputStream: " + incomingMessage);
-
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            tvStatus.setText(incomingMessage);
-                        }
-                    });
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    break;
-                } catch (InterruptedException e){
-                    e.printStackTrace();
-                    break;
-                }
-
-            }
-        }
-
-        *//* Call this from the main activity to shutdown the connection *//*
-        public void cancel() {
-            try {
-                mmSocket.close();
-            } catch (IOException e) {
-            }
-        }
-    }*/
-
 }

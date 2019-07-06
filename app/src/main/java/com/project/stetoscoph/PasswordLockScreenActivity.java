@@ -1,8 +1,8 @@
 package com.project.stetoscoph;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -14,7 +14,7 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
     Pinview pinview;
     Button btnEnter;
 
-    SessionLogin session;
+    SessionSharedPreference session;
     String pw;
 
     @Override
@@ -25,7 +25,7 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
         // initialization
         pinview = (Pinview) findViewById(R.id.pinview_enter_pw);
         btnEnter = (Button) findViewById(R.id.btn_enter_pw);
-        session = new SessionLogin(this);
+        session = new SessionSharedPreference(this);
 
         btnEnter.setOnClickListener(new View.OnClickListener() {
             @Override

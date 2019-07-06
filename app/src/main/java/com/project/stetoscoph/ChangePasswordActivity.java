@@ -1,7 +1,7 @@
 package com.project.stetoscoph;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -13,7 +13,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
     Pinview pinviewOld, pinviewNew;
     Button btnChange;
 
-    SessionLogin session;
+    SessionSharedPreference session;
     String oldPw, newPw;
 
     @Override
@@ -28,7 +28,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
         if (getSupportActionBar() != null) getSupportActionBar().setTitle("Change Password");
 
-        session = new SessionLogin(this);
+        session = new SessionSharedPreference(this);
 
         btnChange.setOnClickListener(new View.OnClickListener() {
             @Override

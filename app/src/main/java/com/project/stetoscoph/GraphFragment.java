@@ -1,33 +1,37 @@
 package com.project.stetoscoph;
 
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.project.stetoscoph.database.DMLHelper;
+import com.project.stetoscoph.entity.Data;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 
@@ -38,28 +42,25 @@ public class GraphFragment extends Fragment {
 
     Button btnStart, btnStop;
     TextView tvFrekuensi;
+    ImageButton imgBtnSave;
 
     private static final String TAG = "GraphFragment";
 
-    //graph init
-    static GraphView graphView;
-    static LineGraphSeries series;
-    private static double graph2LastXValue = 0;
-    private static int Xview = 10;
-
-    private final Handler mHandler = new Handler();
-    private Runnable mTimer;
-    private double graphLastXValue = 5d;
+    private double graphLastXValue = 0d;
     double graphYValue = 0;
     private LineGraphSeries<DataPoint> mSeries;
+    private ArrayList<Double> dataArray = new ArrayList<>();
+
 
     // Bluetooth Stuff
     BluetoothManager btManager;
     BluetoothSocket mBTSocket;
-    BluetoothAdapter btAdapter;
     public ConnectThread connectThread = new ConnectThread();
     public ConnectedThread mConnectedThread;
-    private String address;
+
+    DMLHelper dmlHelper;
+    Data data;
+    SessionSharedPreference session;
 
     public GraphFragment() {
         // Required empty public constructor
@@ -75,7 +76,10 @@ public class GraphFragment extends Fragment {
         btnStart = (Button) v.findViewById(R.id.btn_start_stream);
         btnStop = (Button) v.findViewById(R.id.btn_stop_stream);
         tvFrekuensi = (TextView) v.findViewById(R.id.tv_frekuensi);
+        imgBtnSave = (ImageButton) v.findViewById(R.id.img_btn_save);
         btManager = BluetoothManager.getInstance();
+        dmlHelper = DMLHelper.getInstance(getActivity());
+        session = new SessionSharedPreference(getActivity());
 
         //init(v);
 
@@ -85,21 +89,6 @@ public class GraphFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 connectThread.run();
-                /*mTimer = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (graphLastXValue == 40) {
-                            graphLastXValue = 0;
-                            mSeries.resetData(new DataPoint[] {
-                                    new DataPoint(graphLastXValue, getRandom())
-                            });
-                        }
-                        graphLastXValue += 1d;
-                        mSeries.appendData(new DataPoint(graphLastXValue, graphYValue ), false, 40);
-                        mHandler.postDelayed(this, 50);
-                    }
-                };
-                mHandler.postDelayed(mTimer, 1000);*/
             }
         });
 
@@ -108,25 +97,44 @@ public class GraphFragment extends Fragment {
             public void onClick(View v) {
                 try {
                     mConnectedThread.cancel();
-                    mSeries.resetData(new DataPoint[] {
+                    mSeries.resetData(new DataPoint[]{
                             new DataPoint(graphLastXValue, graphYValue)
                     });
-                } catch (Exception e){
+                    dataArray.clear();
+                } catch (Exception e) {
                     e.getMessage();
                 }
             }
         });
 
+        imgBtnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dmlHelper.open();
+                data = new Data();
+                String date = getDateId();
+
+                data.setTime(date);
+                data.setTitle(session.getUserName());
+
+                String convert = convertArray(dataArray);
+
+                data.setData(convert);
+
+                long result = dmlHelper.insertData(data);
+
+                if (result > 0) {
+                    Toast.makeText(getActivity(), "Data berhasil ditambahkan", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Data gagal ditambahkan", Toast.LENGTH_SHORT).show();
+                }
+
+                dmlHelper.close();
+            }
+        });
+
         return v;
     }
-
-    /*BroadcastReceiver messageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra("theMessage");
-            tvFrekuensi.setText(message);
-        }
-    };*/
 
     private void initGraph(GraphView graph) {
         graph.getViewport().setXAxisBoundsManual(true);
@@ -134,29 +142,17 @@ public class GraphFragment extends Fragment {
         graph.getViewport().setMaxX(40);
 
         graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(-15);
-        graph.getViewport().setMaxY(15);
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(200);
 
         graph.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.NONE);
+        graph.getGridLabelRenderer().setHorizontalLabelsVisible(false);
+        graph.getGridLabelRenderer().setVerticalLabelsVisible(false);
+
         graph.getViewport().setDrawBorder(false);
 
-        // first mSeries is a line
         mSeries = new LineGraphSeries<>();
         graph.addSeries(mSeries);
-    }
-
-
-    @Override
-    public void onPause() {
-        super.onPause();
-//        mHandler.removeCallbacks(mTimer);
-    }
-
-    double mLastRandom = 2;
-
-    private double getRandom() {
-        mLastRandom++;
-        return Math.sin(mLastRandom * 0.5) * 10 * (Math.random() * 10 + 1);
     }
 
     public class ConnectThread extends Thread {
@@ -186,7 +182,7 @@ public class GraphFragment extends Fragment {
             if (!fail) {
                 mConnectedThread = new ConnectedThread(mBTSocket);
                 mConnectedThread.start();
-                /*Toast.makeText(getActivity(), "Connected to " + btDevice.getName(), Toast.LENGTH_SHORT).show();*/
+                Toast.makeText(getActivity(), "Mulai menerima data", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -218,21 +214,27 @@ public class GraphFragment extends Fragment {
                 try {
                     sleep(1000);
                     bytes = mmInStream.read(buffer);
-                    final String incomingMessage = new String(buffer, 0 , bytes);
+                    final String incomingMessage = new String(buffer, 0, bytes);
                     Log.d(TAG, "InputStream: " + incomingMessage);
 
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            graphYValue = Double.parseDouble(incomingMessage);
+                            if (incomingMessage != null) {
+                                graphYValue = Double.parseDouble(incomingMessage);
+                            } else {
+                                graphYValue = 0;
+                            }
+
                             if (graphLastXValue == 40) {
                                 graphLastXValue = 0;
-                                mSeries.resetData(new DataPoint[] {
+                                mSeries.resetData(new DataPoint[]{
                                         new DataPoint(graphLastXValue, graphYValue)
                                 });
                             }
                             graphLastXValue += 1d;
-                            mSeries.appendData(new DataPoint(graphLastXValue, graphYValue ), false, 40);
+                            dataArray.add(graphYValue);
+                            mSeries.appendData(new DataPoint(graphLastXValue, graphYValue), false, 40);
                             tvFrekuensi.setText(incomingMessage + " hz");
                         }
                     });
@@ -240,7 +242,7 @@ public class GraphFragment extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                     break;
-                } catch (InterruptedException e){
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                     break;
                 }
@@ -262,8 +264,22 @@ public class GraphFragment extends Fragment {
         super.onDestroy();
         try {
             mConnectedThread.cancel();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.getMessage();
         }
+    }
+
+    @NonNull
+    private String getDateId() {
+        Date currentDate = Calendar.getInstance().getTime();
+
+        DateFormat format = new SimpleDateFormat("yyy/MM/dd/kk:mm:ss", Locale.US);
+
+        return format.format(currentDate);
+    }
+
+    private String convertArray(ArrayList<Double> arrayList) {
+        Gson gson = new Gson();
+        return gson.toJson(arrayList);
     }
 }

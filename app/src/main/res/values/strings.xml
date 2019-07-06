@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">Stetoscoph</string>
-    <string name="title">WIRELESS STETOSCOPH ELECTRONIC</string>
+    <string name="app_name">Stethoscope</string>
+    <string name="title">WIRELESS STETHOSCOPE ELECTRONIC</string>
     <string name="home_title">Heart Monitoring</string>
-    <string name="username">Username</string>
+    <string name="nama_tenaga_medis">Nama Tenaga Medis</string>
     <string name="product_code">Product Code</string>
     <string name="submit">Submit</string>
     <string name="frekuensi_detak_jantung">Frekuensi Detak Jantung</string>

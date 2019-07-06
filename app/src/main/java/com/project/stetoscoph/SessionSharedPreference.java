@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-public class SessionLogin {
-    // class ini untuk mengatur sesi login
+public class SessionSharedPreference {
+    // class ini untuk mengatur sesi login dan password
 
     // vars
     private static final String PREFERENCES_NAME = "MyPrefs";
@@ -20,12 +20,18 @@ public class SessionLogin {
     SharedPreferences.Editor editor;
     Context c;
 
-    public SessionLogin(Context context) {
+    public SessionSharedPreference(Context context) {
         c = context;
         pref = c.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         editor = pref.edit();
     }
 
+    // method untuk mengambil username yang ada di shared prefrenc
+    public String getUserName() {
+        return pref.getString(USERNAME_KEY, "");
+    }
+
+    // menyimpan sesi login, username, dan code ke file sharedpreference
     public void createUserLoginSession(String username, String code) {
         editor.putBoolean(IS_USER_LOGIN, true);
         editor.putBoolean(IS_PASSWORD_ENABLED, false);

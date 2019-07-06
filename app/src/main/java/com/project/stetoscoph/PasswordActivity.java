@@ -1,7 +1,7 @@
 package com.project.stetoscoph;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -13,7 +13,7 @@ public class PasswordActivity extends AppCompatActivity {
     Pinview pinview;
     Button btnSet, btnRemove;
 
-    SessionLogin session;
+    SessionSharedPreference session;
 
     String pw;
     Boolean isPasswordEnabled;
@@ -27,7 +27,7 @@ public class PasswordActivity extends AppCompatActivity {
         btnSet = (Button) findViewById(R.id.btn_set);
         btnRemove = (Button) findViewById(R.id.btn_remove);
         pinview = (Pinview) findViewById(R.id.pinview);
-        session = new SessionLogin(this);
+        session = new SessionSharedPreference(this);
 
         isPasswordEnabled = session.isPasswordEnabled();
 
@@ -36,7 +36,7 @@ public class PasswordActivity extends AppCompatActivity {
             if (isPasswordEnabled) {
                 getSupportActionBar().setTitle("Remove Password");
             }
-            if(!isPasswordEnabled) {
+            if (!isPasswordEnabled) {
                 getSupportActionBar().setTitle("Set Password");
             }
 

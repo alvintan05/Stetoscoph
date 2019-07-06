@@ -20,7 +20,7 @@ public class LockFragment extends Fragment {
     TextView tvStatus;
     Button btnSet, btnChange;
 
-    SessionLogin session;
+    SessionSharedPreference session;
 
     Boolean isPasswordEnabled;
 
@@ -38,7 +38,7 @@ public class LockFragment extends Fragment {
         tvStatus = (TextView) v.findViewById(R.id.tv_pw_status);
         btnSet = (Button) v.findViewById(R.id.btn_set_pw);
         btnChange = (Button) v.findViewById(R.id.btn_change_pw);
-        session = new SessionLogin(getActivity());
+        session = new SessionSharedPreference(getActivity());
 
         checkPasswordStatus();
 

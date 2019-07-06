@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PasswordLockScreenActivity"></activity>
+        <activity android:name=".ReportDetailActivity"></activity>
+        <activity android:name=".PasswordLockScreenActivity" />
         <activity android:name=".ChangePasswordActivity" />
         <activity android:name=".PasswordActivity" />
         <activity
