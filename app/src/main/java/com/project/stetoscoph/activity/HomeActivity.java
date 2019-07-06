@@ -1,4 +1,4 @@
-package com.project.stetoscoph;
+package com.project.stetoscoph.activity;
 
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -13,6 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import com.project.stetoscoph.fragment.PairProductFragment;
+import com.project.stetoscoph.R;
+import com.project.stetoscoph.fragment.ReportFragment;
+import com.project.stetoscoph.SessionSharedPreference;
+import com.project.stetoscoph.fragment.GraphFragment;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -97,10 +103,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             case R.id.menu_report:
                 fragment = new ReportFragment();
                 title = "Report";
-                break;
-            case R.id.menu_lock:
-                fragment = new LockFragment();
-                title = "Lock App";
                 break;
         }
 

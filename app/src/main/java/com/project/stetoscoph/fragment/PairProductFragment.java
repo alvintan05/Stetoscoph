@@ -1,4 +1,4 @@
-package com.project.stetoscoph;
+package com.project.stetoscoph.fragment;
 
 
 import android.bluetooth.BluetoothAdapter;
@@ -18,6 +18,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.project.stetoscoph.BluetoothManager;
+import com.project.stetoscoph.R;
 
 import java.util.ArrayList;
 import java.util.Set;

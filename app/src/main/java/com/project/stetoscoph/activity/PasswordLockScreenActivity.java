@@ -1,4 +1,4 @@
-package com.project.stetoscoph;
+package com.project.stetoscoph.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.goodiebag.pinview.Pinview;
+import com.project.stetoscoph.R;
+import com.project.stetoscoph.SessionSharedPreference;
 
 public class PasswordLockScreenActivity extends AppCompatActivity {
 

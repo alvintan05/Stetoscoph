@@ -1,4 +1,4 @@
-package com.project.stetoscoph;
+package com.project.stetoscoph.fragment;
 
 
 import android.app.ProgressDialog;
@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.project.stetoscoph.AdapterReportData;
+import com.project.stetoscoph.R;
 import com.project.stetoscoph.database.DMLHelper;
 import com.project.stetoscoph.database.LoadDatasCallback;
 import com.project.stetoscoph.entity.Data;

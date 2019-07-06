@@ -1,4 +1,4 @@
-package com.project.stetoscoph;
+package com.project.stetoscoph.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.goodiebag.pinview.Pinview;
+import com.project.stetoscoph.R;
+import com.project.stetoscoph.SessionSharedPreference;
 
 public class PasswordActivity extends AppCompatActivity {
 

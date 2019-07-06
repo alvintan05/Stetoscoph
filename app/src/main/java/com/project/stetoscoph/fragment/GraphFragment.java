@@ -1,4 +1,4 @@
-package com.project.stetoscoph;
+package com.project.stetoscoph.fragment;
 
 
 import android.bluetooth.BluetoothDevice;
@@ -21,6 +21,9 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.project.stetoscoph.BluetoothManager;
+import com.project.stetoscoph.R;
+import com.project.stetoscoph.SessionSharedPreference;
 import com.project.stetoscoph.database.DMLHelper;
 import com.project.stetoscoph.entity.Data;
 

@@ -1,4 +1,4 @@
-package com.project.stetoscoph;
+package com.project.stetoscoph.activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -12,6 +12,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.project.stetoscoph.R;
+import com.project.stetoscoph.SessionSharedPreference;
 
 public class MainActivity extends AppCompatActivity {
 
