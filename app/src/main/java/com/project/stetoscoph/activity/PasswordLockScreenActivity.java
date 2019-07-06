@@ -28,23 +28,5 @@ public class PasswordLockScreenActivity extends AppCompatActivity {
         pinview = (Pinview) findViewById(R.id.pinview_enter_pw);
         btnEnter = (Button) findViewById(R.id.btn_enter_pw);
         session = new SessionSharedPreference(this);
-
-        btnEnter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pw = pinview.getValue();
-
-                if (session.checkPassword(pw)) {
-                    startActivity(new Intent(PasswordLockScreenActivity.this, HomeActivity.class));
-                    session.passwordEntered();
-                    Toast.makeText(PasswordLockScreenActivity.this, "Password Correct", Toast.LENGTH_SHORT).show();
-                    finish();
-                } else {
-                    Toast.makeText(PasswordLockScreenActivity.this, "Password did not match, try again", Toast.LENGTH_SHORT).show();
-                    pinview.setValue("");
-                }
-
-            }
-        });
     }
 }

@@ -16,8 +16,6 @@
         android:theme="@style/AppTheme">
         <activity android:name=".activity.ReportDetailActivity"></activity>
         <activity android:name=".activity.PasswordLockScreenActivity" />
-        <activity android:name=".activity.ChangePasswordActivity" />
-        <activity android:name=".activity.PasswordActivity" />
         <activity
             android:name=".activity.HomeActivity"
             android:theme="@style/NoToolbar">

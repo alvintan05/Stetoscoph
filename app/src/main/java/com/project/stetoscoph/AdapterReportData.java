@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.project.stetoscoph.activity.ReportDetailActivity;
 import com.project.stetoscoph.entity.Data;
 
 import java.util.ArrayList;
