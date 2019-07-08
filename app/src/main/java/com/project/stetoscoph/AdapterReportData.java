@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.project.stetoscoph.activity.PasswordLockScreenActivity;
 import com.project.stetoscoph.activity.ReportDetailActivity;
 import com.project.stetoscoph.entity.Data;
 
@@ -22,10 +23,6 @@ public class AdapterReportData extends RecyclerView.Adapter<AdapterReportData.Vi
 
     public AdapterReportData(Context context) {
         this.context = context;
-    }
-
-    public ArrayList<Data> getListData() {
-        return listData;
     }
 
     public void setListData(ArrayList<Data> listData) {
@@ -51,8 +48,9 @@ public class AdapterReportData extends RecyclerView.Adapter<AdapterReportData.Vi
         viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, ReportDetailActivity.class);
+                Intent intent = new Intent(context, PasswordLockScreenActivity.class);
                 intent.putExtra("data", listData.get(i).getData());
+                intent.putExtra("nama", listData.get(i).getTitle());
                 context.startActivity(intent);
             }
         });

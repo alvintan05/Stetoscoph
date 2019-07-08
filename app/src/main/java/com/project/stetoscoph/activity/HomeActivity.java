@@ -20,7 +20,8 @@ import com.project.stetoscoph.fragment.ReportFragment;
 import com.project.stetoscoph.SessionSharedPreference;
 import com.project.stetoscoph.fragment.GraphFragment;
 
-public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class
+HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     ActionBarDrawerToggle actionBarDrawerToggle;
     DrawerLayout drawerLayout;

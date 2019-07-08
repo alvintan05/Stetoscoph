@@ -215,7 +215,7 @@ public class GraphFragment extends Fragment {
             // Keep listening to the InputStream until an exception occurs
             while (true) {
                 try {
-                    sleep(1000);
+                    sleep(300);
                     bytes = mmInStream.read(buffer);
                     final String incomingMessage = new String(buffer, 0, bytes);
                     Log.d(TAG, "InputStream: " + incomingMessage);
