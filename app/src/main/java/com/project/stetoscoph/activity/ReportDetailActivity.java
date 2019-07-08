@@ -19,7 +19,7 @@ public class ReportDetailActivity extends AppCompatActivity {
     String getdata;
     GraphView graphView;
     LineGraphSeries<DataPoint> series;
-    ArrayList<Double> dataArray;
+    ArrayList<Integer> dataArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +43,7 @@ public class ReportDetailActivity extends AppCompatActivity {
     private void initGraph(GraphView graph) {
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(200);
+        graph.getViewport().setMaxX(60);
 
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinY(0);
@@ -61,7 +61,7 @@ public class ReportDetailActivity extends AppCompatActivity {
         // first mSeries is a line
         series = new LineGraphSeries<>();
 
-        for (int i = 0; i < dataArray.size(); i++) {
+        for (int i = 0; i < dataArray.size(); i += 0.03) {
             series.appendData(new DataPoint(i, dataArray.get(i)), true, dataArray.size());
         }
 
@@ -74,11 +74,11 @@ public class ReportDetailActivity extends AppCompatActivity {
         return super.onSupportNavigateUp();
     }
 
-    public ArrayList<Double> jsonToArrray(String json) {
+    public ArrayList<Integer> jsonToArrray(String json) {
         Gson gson = new Gson();
-        Type type = new TypeToken<ArrayList<Double>>() {
+        Type type = new TypeToken<ArrayList<Integer>>() {
         }.getType();
-        ArrayList<Double> array = gson.fromJson(json, type);
+        ArrayList<Integer> array = gson.fromJson(json, type);
         return array;
     }
 }

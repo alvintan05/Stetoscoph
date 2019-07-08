@@ -50,9 +50,9 @@ public class GraphFragment extends Fragment {
     private static final String TAG = "GraphFragment";
 
     private double graphLastXValue = 0d;
-    double graphYValue = 0;
+    int graphYValue = 0;
     private LineGraphSeries<DataPoint> mSeries;
-    private ArrayList<Double> dataArray = new ArrayList<>();
+    private ArrayList<Integer> dataArray = new ArrayList<>();
 
 
     // Bluetooth Stuff
@@ -215,7 +215,7 @@ public class GraphFragment extends Fragment {
             // Keep listening to the InputStream until an exception occurs
             while (true) {
                 try {
-                    sleep(300);
+                    sleep(30);
                     bytes = mmInStream.read(buffer);
                     final String incomingMessage = new String(buffer, 0, bytes);
                     Log.d(TAG, "InputStream: " + incomingMessage);
@@ -224,20 +224,20 @@ public class GraphFragment extends Fragment {
                         @Override
                         public void run() {
                             if (incomingMessage != null) {
-                                graphYValue = Double.parseDouble(incomingMessage);
+                                graphYValue = Integer.parseInt(incomingMessage);
                             } else {
                                 graphYValue = 0;
                             }
 
-                            if (graphLastXValue == 40) {
+                            if (graphLastXValue == 30) {
                                 graphLastXValue = 0;
                                 mSeries.resetData(new DataPoint[]{
                                         new DataPoint(graphLastXValue, graphYValue)
                                 });
                             }
-                            graphLastXValue += 1d;
+                            graphLastXValue += 0.03;
                             dataArray.add(graphYValue);
-                            mSeries.appendData(new DataPoint(graphLastXValue, graphYValue), false, 40);
+                            mSeries.appendData(new DataPoint(graphLastXValue, graphYValue), false, 1000);
                             tvFrekuensi.setText(incomingMessage + " hz");
                         }
                     });
@@ -281,7 +281,7 @@ public class GraphFragment extends Fragment {
         return format.format(currentDate);
     }
 
-    private String convertArray(ArrayList<Double> arrayList) {
+    private String convertArray(ArrayList<Integer> arrayList) {
         Gson gson = new Gson();
         return gson.toJson(arrayList);
     }

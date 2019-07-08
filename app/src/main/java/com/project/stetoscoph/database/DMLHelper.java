@@ -87,17 +87,4 @@ public class DMLHelper {
         args.put(DATA, data.getData());
         return database.insert(DATABASE_TABLE, null, args);
     }
-
-    // fungsi untuk memperbarui data
-    public int updateData(Data data) {
-        ContentValues args = new ContentValues();
-        args.put(TITLE, data.getTitle());
-        args.put(TIME, data.getTime());
-        return database.update(DATABASE_TABLE, args, _ID + "= '" + data.getId() + "'", null);
-    }
-
-    // fungsi untuk menghapus data
-    public int deleteData(int id) {
-        return database.delete(TABLE_DATA, _ID + " = '" + id + "'", null);
-    }
 }
