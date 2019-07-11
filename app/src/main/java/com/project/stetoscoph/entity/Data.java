@@ -1,6 +1,7 @@
 package com.project.stetoscoph.entity;
 
 public class Data {
+    // ini adalah entitas atau biasa disebut model class yang variabel nya disesuaikan dengan kolom pada tabel
 
     private int id;
     private String title;

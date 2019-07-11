@@ -8,7 +8,7 @@ import com.project.stetoscoph.activity.MainActivity;
 import com.project.stetoscoph.activity.PasswordLockScreenActivity;
 
 public class SessionSharedPreference {
-    // class ini untuk mengatur sesi login dan password
+    // class ini untuk mengatur sesi login
 
     // vars
     private static final String PREFERENCES_NAME = "MyPrefs";
@@ -31,7 +31,7 @@ public class SessionSharedPreference {
         return pref.getString(USERNAME_KEY, "");
     }
 
-    // menyimpan sesi login, username, dan code ke file sharedpreference
+    //method untuk menyimpan sesi login, username, dan code ke file sharedpreference
     public void createUserLoginSession(String username, String code) {
         editor.putBoolean(IS_USER_LOGIN, true);
         editor.putString(USERNAME_KEY, username);
@@ -39,6 +39,7 @@ public class SessionSharedPreference {
         editor.apply();
     }
 
+    // method untuk menghapus data login user, method ini nantinya dipanggil saat proses logout
     public void deleteUserLoginSession() {
         editor.clear();
         editor.apply();
@@ -48,6 +49,12 @@ public class SessionSharedPreference {
 
     }
 
+    // fungsi untuk mengecek apakah user sudah login atau belum dan akan menghasilkan nilai balik true atau false
+    public boolean isUserLoggedIn() {
+        return pref.getBoolean(IS_USER_LOGIN, false);
+    }
+
+    // fungsi untuk mengecek login user, apabila belum login maka akan kembali ke activity login
     public boolean checkLogin() {
 
         if (!this.isUserLoggedIn()) {
@@ -60,10 +67,5 @@ public class SessionSharedPreference {
         }
 
         return false;
-    }
-
-    // fungsi untuk mengecek apakah user sudah login atau belum
-    public boolean isUserLoggedIn() {
-        return pref.getBoolean(IS_USER_LOGIN, false);
     }
 }

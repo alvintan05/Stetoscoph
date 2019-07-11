@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.project.stetoscoph.R;
 import com.project.stetoscoph.SessionSharedPreference;
 
+// activity ketika halaman login
 public class MainActivity extends AppCompatActivity {
 
     // widget
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         session = new SessionSharedPreference(getApplicationContext());
 
+        // ketika tombol submit ditekan makan akan memanggil method validateLength()
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,35 +55,44 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // method ini untuk mengecek apakah panjang karakter sudah lebih dari 8
     private void validateLength() {
         int c = edtCode.getText().toString().trim().length();
         if (c < 8)
+            // jika kurang dari 8 akan menampilkan pesan error berikut
             textInputLayout.setError("Code minimal 8 karakter !");
         if (c >= 8) {
+            // jika lebih dari sama dengan 8 maka akan memanggil method checkCode()
             checkCode();
         }
     }
 
+    // method untuk memvalidasi dan mengecek apakah kode yang dimasukkan sesuai dengan ketentuan
     private void checkCode() {
         String u = edtUsername.getText().toString().trim();
         String c = edtCode.getText().toString().trim();
         switch (c) {
             case "12345678":
+                // jika kode cocok maka akan menjalankan method loginUser() dengan parameter text username dan text code
                 loginUser(u, c);
                 break;
             case "11111111":
                 loginUser(u, c);
                 break;
             default:
+                // jika kode tidak cocok maka akan menampilkan pesan error berikut
                 textInputLayout.setError("Code tidak valid");
         }
     }
 
+    // method ini untuk berpindah halaman ke homeactivity dan menyimpan sesi login pada sharedpreference
     private void loginUser(String username, String code) {
+        // ini untuk berpindah
         Intent i = new Intent(MainActivity.this, HomeActivity.class);
         startActivity(i);
         finish();
 
+        // ini untuk menyimpan sesi login
         session.createUserLoginSession(username, code);
         Toast.makeText(this, "Product Activated", Toast.LENGTH_SHORT).show();
     }

@@ -1,11 +1,15 @@
 package com.project.stetoscoph.fragment;
 
 
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +33,7 @@ import com.project.stetoscoph.entity.Data;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,11 +42,13 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
+import me.aflak.bluetooth.Bluetooth;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class GraphFragment extends Fragment {
+public class GraphFragment extends Fragment implements Bluetooth.CommunicationCallback {
 
     Button btnStart, btnStop;
     TextView tvFrekuensi;
@@ -50,16 +57,14 @@ public class GraphFragment extends Fragment {
     private static final String TAG = "GraphFragment";
 
     private double graphLastXValue = 0d;
-    int graphYValue = 0;
+    double graphYValue = 0d;
     private LineGraphSeries<DataPoint> mSeries;
-    private ArrayList<Integer> dataArray = new ArrayList<>();
+    private ArrayList<Double> dataArray = new ArrayList<>();
 
 
     // Bluetooth Stuff
     BluetoothManager btManager;
-    BluetoothSocket mBTSocket;
-    public ConnectThread connectThread = new ConnectThread();
-    public ConnectedThread mConnectedThread;
+    private Bluetooth b;
 
     DMLHelper dmlHelper;
     Data data;
@@ -75,6 +80,7 @@ public class GraphFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_graph, container, false);
 
+        // inisialisasi widget dan variabel
         final GraphView graph = (GraphView) v.findViewById(R.id.graph);
         btnStart = (Button) v.findViewById(R.id.btn_start_stream);
         btnStop = (Button) v.findViewById(R.id.btn_stop_stream);
@@ -84,32 +90,35 @@ public class GraphFragment extends Fragment {
         dmlHelper = DMLHelper.getInstance(getActivity());
         session = new SessionSharedPreference(getActivity());
 
-        //init(v);
-
         initGraph(graph);
 
+        // inisalisasi library bluetooth
+        b = new Bluetooth(getActivity());
+        b.setCommunicationCallback(this);
+
+        // Button start di klik
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                connectThread.run();
+                // Melakukan koneksi ke device dan mulai menerima data
+                b.connectToDevice(btManager.getBtDevice());
             }
         });
 
+        // Button stop di klik
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    mConnectedThread.cancel();
-                    mSeries.resetData(new DataPoint[]{
-                            new DataPoint(graphLastXValue, graphYValue)
-                    });
-                    dataArray.clear();
-                } catch (Exception e) {
-                    e.getMessage();
-                }
+                b.disconnect();
+                graphLastXValue = 0d;
+                mSeries.resetData(new DataPoint[]{
+                        new DataPoint(graphLastXValue, graphYValue)
+                });
+                dataArray.clear();
             }
         });
 
+        // Ketika klik save
         imgBtnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,18 +148,27 @@ public class GraphFragment extends Fragment {
         return v;
     }
 
+    // untuk menginisialisasi bagian grafik
     private void initGraph(GraphView graph) {
         graph.getViewport().setXAxisBoundsManual(true);
+        // minimal x
         graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(40);
+        // maximal x
+        graph.getViewport().setMaxX(30);
 
         graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(0);
+        // minimal y
+        graph.getViewport().setMinY(-200);
+        // maximal y
         graph.getViewport().setMaxY(200);
 
         graph.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.NONE);
-        graph.getGridLabelRenderer().setHorizontalLabelsVisible(false);
-        graph.getGridLabelRenderer().setVerticalLabelsVisible(false);
+        // title di x
+        graph.getGridLabelRenderer().setHorizontalAxisTitle("time (s)");
+        graph.getGridLabelRenderer().setHorizontalAxisTitleTextSize(22);
+        // title di y
+        graph.getGridLabelRenderer().setVerticalAxisTitle("amplitudo (A)");
+        graph.getGridLabelRenderer().setVerticalAxisTitleTextSize(22);
 
         graph.getViewport().setDrawBorder(false);
 
@@ -158,120 +176,64 @@ public class GraphFragment extends Fragment {
         graph.addSeries(mSeries);
     }
 
-    public class ConnectThread extends Thread {
-        public void run() {
-            boolean fail = false;
-
-            BluetoothDevice device = btManager.getBtDevice();
-
-            try {
-                mBTSocket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
-            } catch (IOException e) {
-                fail = true;
-                Toast.makeText(getActivity(), "Socket Creation Failed", Toast.LENGTH_SHORT).show();
-            }
-            // Establish the Bluetooth socket connection.
-            try {
-                mBTSocket.connect();
-            } catch (IOException e) {
-                try {
-                    fail = true;
-                    mBTSocket.close();
-                } catch (IOException e2) {
-                    //insert code to deal with this
-                    Toast.makeText(getActivity(), "Socket Creation Failed", Toast.LENGTH_SHORT).show();
-                }
-            }
-            if (!fail) {
-                mConnectedThread = new ConnectedThread(mBTSocket);
-                mConnectedThread.start();
+    // Saat sudah konek ke device maka akan muncul toast berikut
+    @Override
+    public void onConnect(BluetoothDevice device) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
                 Toast.makeText(getActivity(), "Mulai menerima data", Toast.LENGTH_SHORT).show();
             }
-        }
-
-    }
-
-    private class ConnectedThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final InputStream mmInStream;
-
-        public ConnectedThread(BluetoothSocket socket) {
-            mmSocket = socket;
-            InputStream tmpIn = null;
-
-            // Get the input and output streams, using temp objects because
-            // member streams are final
-            try {
-                tmpIn = socket.getInputStream();
-            } catch (IOException e) {
-            }
-
-            mmInStream = tmpIn;
-        }
-
-        public void run() {
-            byte[] buffer = new byte[1024];  // buffer store for the stream
-            int bytes; // bytes returned from read()
-            // Keep listening to the InputStream until an exception occurs
-            while (true) {
-                try {
-                    sleep(30);
-                    bytes = mmInStream.read(buffer);
-                    final String incomingMessage = new String(buffer, 0, bytes);
-                    Log.d(TAG, "InputStream: " + incomingMessage);
-
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (incomingMessage != null) {
-                                graphYValue = Integer.parseInt(incomingMessage);
-                            } else {
-                                graphYValue = 0;
-                            }
-
-                            if (graphLastXValue == 30) {
-                                graphLastXValue = 0;
-                                mSeries.resetData(new DataPoint[]{
-                                        new DataPoint(graphLastXValue, graphYValue)
-                                });
-                            }
-                            graphLastXValue += 0.03;
-                            dataArray.add(graphYValue);
-                            mSeries.appendData(new DataPoint(graphLastXValue, graphYValue), false, 1000);
-                            tvFrekuensi.setText(incomingMessage + " hz");
-                        }
-                    });
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    break;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    break;
-                }
-
-            }
-        }
-
-        //* Call this from the main activity to shutdown the connection *//*
-        public void cancel() {
-            try {
-                mmSocket.close();
-            } catch (IOException e) {
-            }
-        }
+        });
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        try {
-            mConnectedThread.cancel();
-        } catch (Exception e) {
-            e.getMessage();
-        }
+    public void onDisconnect(BluetoothDevice device, String message) {
+
     }
 
+    // Saat menerima data
+    @Override
+    public void onMessage(final String message) {
+        // memanggil method Display untuk mengirim data yang diterima untuk kemudian digambar ke grafik
+        Display(message.trim());
+        Log.d(TAG, "onMessage: " + message.trim());
+    }
+
+    // Method ini untuk menggambar titik pada grafik saat menerima data
+    public void Display(final String s) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (s.trim().equals("")) {
+                    graphYValue = 0.0;
+                } else {
+                    graphYValue = Double.parseDouble(s.trim());
+                }
+
+                dataArray.add(graphYValue);
+
+                // bagian ini untuk menambah titik pada grafik
+                mSeries.appendData(new DataPoint(graphLastXValue, graphYValue), true, 1000);
+
+                tvFrekuensi.setText(s + " hz");
+                // bagian ini untuk mengatur penambahan nilai x
+                graphLastXValue += 0.03;
+            }
+        });
+    }
+
+    @Override
+    public void onError(String message) {
+
+    }
+
+    @Override
+    public void onConnectError(BluetoothDevice device, String message) {
+
+    }
+
+    // Mendapatkan tanggal dan jam saat ini, ini digunakan saat tombol save ditekan
     @NonNull
     private String getDateId() {
         Date currentDate = Calendar.getInstance().getTime();
@@ -281,7 +243,7 @@ public class GraphFragment extends Fragment {
         return format.format(currentDate);
     }
 
-    private String convertArray(ArrayList<Integer> arrayList) {
+    private String convertArray(ArrayList<Double> arrayList) {
         Gson gson = new Gson();
         return gson.toJson(arrayList);
     }

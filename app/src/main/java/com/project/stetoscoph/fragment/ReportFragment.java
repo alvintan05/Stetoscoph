@@ -42,11 +42,10 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_report, container, false);
 
-        // inisialisasi
+        // inisialisasi widget dan variabel
         recyclerView = (RecyclerView) v.findViewById(R.id.rv_data);
         dmlHelper = DMLHelper.getInstance(getActivity());
         progressDialog = new ProgressDialog(getActivity());
-
         progressDialog.setMessage("Harap Tunggu");
 
         dmlHelper.open();
@@ -56,6 +55,7 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
         adapterReportData = new AdapterReportData(getActivity());
         recyclerView.setAdapter(adapterReportData);
 
+        // Untuk melakukan load data
         new LoadDatasAsync(dmlHelper, this).execute();
 
         return v;
@@ -74,9 +74,11 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
     @Override
     public void postExecute(ArrayList<Data> datas) {
         progressDialog.dismiss();
+        // Menaruh data pada list
         adapterReportData.setListData(datas);
     }
 
+    // AsyncTask ini berjalan di background untuk melakukan proses agar tidak mengganggu UI penguna
     private static class LoadDatasAsync extends AsyncTask<Void, Void, ArrayList<Data>> {
 
         private final WeakReference<DMLHelper> weakDataHelper;
@@ -95,6 +97,7 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
 
         @Override
         protected ArrayList<Data> doInBackground(Void... voids) {
+            // Mengambil data dari database
             return weakDataHelper.get().getAllData();
         }
 

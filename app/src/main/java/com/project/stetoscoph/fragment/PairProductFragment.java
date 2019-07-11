@@ -70,12 +70,13 @@ public class PairProductFragment extends Fragment {
         mBTArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1);
         btAdapter = BluetoothAdapter.getDefaultAdapter(); // get a handle on the bluetooth radio
 
-        // check bluetooth status when open app
+        // Jika bluetooth menyala maka button on akan hilang dan button off akan muncul
         if (btAdapter.isEnabled()) {
             btnOn.setVisibility(View.GONE);
             btnOff.setVisibility(View.VISIBLE);
             tvStatus.setText("On");
         } else {
+            // jika bluetooth mati maka button on akan muncul dan button off akan hilang
             btnOff.setVisibility(View.GONE);
             btnOn.setVisibility(View.VISIBLE);
             tvStatus.setText("Off");
@@ -85,13 +86,13 @@ public class PairProductFragment extends Fragment {
         listView.setOnItemClickListener(mDeviceClickListener);
 
         if (btAdapter == null) {
-            // Device does not support Bluetooth
+            // Jika device tidak memiliki bluetooth maka akan muncul toast
             tvStatus.setText("Status: Bluetooth not found");
             Toast.makeText(getActivity().getApplicationContext(), "Bluetooth Device Not Found!", Toast.LENGTH_SHORT).show();
         } else {
-            // if device support bluetooth
+            // Jika device terdapat bluetooth
 
-            // click
+            // Button on di klik
             btnOn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -99,6 +100,7 @@ public class PairProductFragment extends Fragment {
                 }
             });
 
+            // Button of di klik
             btnOff.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -106,6 +108,7 @@ public class PairProductFragment extends Fragment {
                 }
             });
 
+            // Button show pair devices di klik
             btnPair.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -113,6 +116,7 @@ public class PairProductFragment extends Fragment {
                 }
             });
 
+            // Button discover di klik
             btnDiscover.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -124,6 +128,7 @@ public class PairProductFragment extends Fragment {
         return v;
     }
 
+    // method untuk menyalakan bluetooth
     private void turnOnBT() {
         btnOn.setVisibility(View.GONE);
         btnOff.setVisibility(View.VISIBLE);
@@ -133,19 +138,20 @@ public class PairProductFragment extends Fragment {
         Toast.makeText(getActivity(), "Bluetooth Turned On", Toast.LENGTH_SHORT).show();
     }
 
-    // Enter here after user selects "yes" or "no" to enabling radio
+    // Disaat tombol deny dan allow di klik saat menyalakan bluetooth
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
         if (requestCode == REQUEST_ENABLE_BT) {
-            // Make sure the request was successful
             if (resultCode == RESULT_OK) {
+                // jika di klik allow
                 tvStatus.setText("On");
             } else
+                // jika di klik deny
                 tvStatus.setText("Off");
         }
     }
 
+    // Method untuk mematikan bluetooth
     private void turnOffBT() {
         btnOff.setVisibility(View.GONE);
         btnOn.setVisibility(View.VISIBLE);
@@ -157,6 +163,7 @@ public class PairProductFragment extends Fragment {
         mBTArrayAdapter.clear();
     }
 
+    // Method untuk menampilkan device yang sudah paired
     private void listPairedDevices(View v) {
         mPairedDevices = btAdapter.getBondedDevices();
         if (btAdapter.isDiscovering()) {
@@ -176,8 +183,8 @@ public class PairProductFragment extends Fragment {
             Toast.makeText(getActivity(), "Bluetooth Not On", Toast.LENGTH_SHORT).show();
     }
 
+    // Method untuk mencari device di sekitar
     private void discoverDevices(View view) {
-        // Check if the device is already discovering
         if (btAdapter.isDiscovering()) {
             btAdapter.cancelDiscovery();
             getActivity().unregisterReceiver(discoverReceiver);
@@ -197,6 +204,7 @@ public class PairProductFragment extends Fragment {
         }
     }
 
+    // Receiver ini akan berjalan setiap satu device yang ditemukan disekitar
     private final BroadcastReceiver discoverReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -214,6 +222,7 @@ public class PairProductFragment extends Fragment {
         }
     };
 
+    // Ketika salah satu item di list di klik
     private AdapterView.OnItemClickListener mDeviceClickListener;
 
     {
@@ -235,6 +244,7 @@ public class PairProductFragment extends Fragment {
 
                 tvStatus.setText("Connecting");
 
+                // Menaruh bluetooth device ke dalam class BluetoothManager agar dapat digunakan pada halaman graph fragment
                 btManager.setBtDevice(mBTDevicesList.get(arg2));
 
                 if (btManager.getBtDevice() != null) {

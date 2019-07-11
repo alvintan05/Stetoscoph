@@ -36,7 +36,7 @@ HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // initialization
+        // initialization widget and object
         toolbar = (Toolbar) findViewById(R.id.home_toolbar);
         setSupportActionBar(toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -59,6 +59,7 @@ HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationIte
                     .commit();
         }
 
+        // ketika pilihan log out di klik
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,12 +84,15 @@ HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationIte
         drawerLayout.removeDrawerListener(actionBarDrawerToggle);
     }
 
+
+    // ketika item menu navigasi di klik maka akan pindah ke halaman tersebut
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         Fragment fragment = null;
         String title = "";
 
         switch (menuItem.getItemId()) {
+            // ketika menu pairing di klik akan pindah ke menu tersebut, dengan menampung nya pada variabel fragment
             case R.id.menu_pairing:
                 fragment = new PairProductFragment();
                 title = "Pairing Product";
@@ -103,6 +107,7 @@ HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationIte
                 break;
         }
 
+        // disini untuk mengatur fragment mana yang akan ditampilkan
         if (fragment != null) {
             getSupportFragmentManager()
                     .beginTransaction()

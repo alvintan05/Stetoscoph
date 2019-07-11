@@ -19,8 +19,10 @@ import static com.project.stetoscoph.database.DatabaseContract.TABLE_DATA;
 
 public class DMLHelper {
 
+    // Pendefinisian variabel string yang menampung nama tabel
     private static final String DATABASE_TABLE = TABLE_DATA;
 
+    // Pendefinisian variabel
     private static DatabaseHelper dataBaseHelper;
     private static DMLHelper INSTANCE;
     private static SQLiteDatabase database;
@@ -41,11 +43,12 @@ public class DMLHelper {
         return INSTANCE;
     }
 
-    // untuk membuka dan menutup koneksi database
+    // untuk membuka koneksi database
     public void open() throws SQLException {
         database = dataBaseHelper.getWritableDatabase();
     }
 
+    // untuk menutup koneksi database
     public void close() {
         dataBaseHelper.close();
         if (database.isOpen())

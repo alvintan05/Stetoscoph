@@ -16,6 +16,8 @@ import com.project.stetoscoph.entity.Data;
 
 import java.util.ArrayList;
 
+// class ini untuk mengatur list pada report fragment
+
 public class AdapterReportData extends RecyclerView.Adapter<AdapterReportData.ViewHolder> {
 
     private ArrayList<Data> listData = new ArrayList<>();

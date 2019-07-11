@@ -9,6 +9,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static String DATABASE_NAME = "dbstetoschop";
 
     private static final int DATABASE_VERSION = 1;
+
+    // fungsi untuk membuat tabel database dengan kolom id, title, time, dan data
     private static final String SQL_CREATE_TABLE = String.format("CREATE TABLE %s"
                     + " (%s INTEGER PRIMARY KEY AUTOINCREMENT," +
                     " %s TEXT NOT NULL," +
