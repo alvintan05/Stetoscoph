@@ -45,6 +45,7 @@ public class AdapterReportData extends RecyclerView.Adapter<AdapterReportData.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
+        // mengatur tampilan setiap item list
         viewHolder.tvJudul.setText(listData.get(i).getTitle());
         viewHolder.tvTanggal.setText(listData.get(i).getTime());
         viewHolder.cardView.setOnClickListener(new View.OnClickListener() {

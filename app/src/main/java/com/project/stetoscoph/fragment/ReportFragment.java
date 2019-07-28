@@ -26,10 +26,13 @@ import java.util.ArrayList;
  */
 public class ReportFragment extends Fragment implements LoadDatasCallback {
 
+    // widget
     private RecyclerView recyclerView;
+    private ProgressDialog progressDialog;
+
+    // variabel
     private AdapterReportData adapterReportData;
     private DMLHelper dmlHelper;
-    private ProgressDialog progressDialog;
 
     public ReportFragment() {
         // Required empty public constructor
@@ -44,12 +47,17 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
 
         // inisialisasi widget dan variabel
         recyclerView = (RecyclerView) v.findViewById(R.id.rv_data);
-        dmlHelper = DMLHelper.getInstance(getActivity());
         progressDialog = new ProgressDialog(getActivity());
+
+        // membuat objek
+        dmlHelper = DMLHelper.getInstance(getActivity());
+        // menampilkan progress dialog
         progressDialog.setMessage("Harap Tunggu");
 
+        // membuka database agar dapat diakses
         dmlHelper.open();
 
+        // mengatur list
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setHasFixedSize(true);
         adapterReportData = new AdapterReportData(getActivity());
@@ -66,6 +74,7 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                // menampilkan progress dialog
                 progressDialog.show();
             }
         });
@@ -73,6 +82,7 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
 
     @Override
     public void postExecute(ArrayList<Data> datas) {
+        // menutup progress dialog
         progressDialog.dismiss();
         // Menaruh data pada list
         adapterReportData.setListData(datas);
@@ -92,11 +102,14 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            // sebelum eksekusi
+            // memanggil method preExecute() di atas
             weakCallback.get().preExecute();
         }
 
         @Override
         protected ArrayList<Data> doInBackground(Void... voids) {
+            // melakukan eksekusi
             // Mengambil data dari database
             return weakDataHelper.get().getAllData();
         }
@@ -104,6 +117,8 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
         @Override
         protected void onPostExecute(ArrayList<Data> data) {
             super.onPostExecute(data);
+            // setelah eksekusi
+            // memanggil method postExecute() di atas
             weakCallback.get().postExecute(data);
         }
     }

@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-
+    // nama database
     public static String DATABASE_NAME = "dbstetoschop";
 
     private static final int DATABASE_VERSION = 1;
@@ -29,6 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // menjalankan method untuk membuat table database
         db.execSQL(SQL_CREATE_TABLE);
     }
 

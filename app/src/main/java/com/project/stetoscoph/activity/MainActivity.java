@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText edtCode, edtUsername;
     private TextInputLayout textInputLayout;
 
+    // variabel session
     SessionSharedPreference session;
 
     @Override
@@ -38,15 +39,22 @@ public class MainActivity extends AppCompatActivity {
         textInputLayout = (TextInputLayout) findViewById(R.id.text_input_code);
 
         // Mengecek apakah permission lokasi sudah diberikan oleh user, kalau blm maka akan memunculkan dialog untuk meminta akses lokasi
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            // apabila belum diberi akses maka akan memunculkan pop up untuk meminta akses permisi lokasi
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            // apabila belum diberi akses maka akan memunculkan pop up untuk meminta akses permisi lokasi
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
 
+        // pembuatan objek sesson agar dapat menggunakan method dan fungsi yang ada pada kelas SessionSharedPreference
         session = new SessionSharedPreference(getApplicationContext());
 
-        // ketika tombol submit ditekan makan akan memanggil method validateLength()
+        /*Menghandle aksi saat user menekan tombol
+        saat tombol ditekan akan menjalankan method validateLength()
+        * */
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
     // method ini untuk mengecek apakah panjang karakter sudah lebih dari 8
     private void validateLength() {
+        // variabel c dengan tipe data integer yang menampung panjang karakter dari input user pada edit text product code
         int c = edtCode.getText().toString().trim().length();
         if (c < 8)
             // jika kurang dari 8 akan menampilkan pesan error berikut
@@ -69,14 +78,20 @@ public class MainActivity extends AppCompatActivity {
 
     // method untuk memvalidasi dan mengecek apakah kode yang dimasukkan sesuai dengan ketentuan
     private void checkCode() {
+        // variabel u dengan tipe data string yang menampung input dari edit text username
         String u = edtUsername.getText().toString().trim();
+        // variabel c dengan tipe data string yang menampung input dari edit text proudct code
         String c = edtCode.getText().toString().trim();
+        // percabangan switch yang akan mengecek apakah c sama dengan case yang dibawah
         switch (c) {
             case "12345678":
                 // jika kode cocok maka akan menjalankan method loginUser() dengan parameter text username dan text code
+                // parameter ini dikirim agar dapat digunakan pada proses yang ada didalam method loginUSer()
                 loginUser(u, c);
                 break;
             case "11111111":
+                // jika kode cocok maka akan menjalankan method loginUser() dengan parameter text username dan text code
+                // parameter ini dikirim agar dapat digunakan pada proses yang ada didalam method loginUSer()
                 loginUser(u, c);
                 break;
             default:
@@ -87,13 +102,18 @@ public class MainActivity extends AppCompatActivity {
 
     // method ini untuk berpindah halaman ke homeactivity dan menyimpan sesi login pada sharedpreference
     private void loginUser(String username, String code) {
-        // ini untuk berpindah
+        // Untuk berpindah ke halaman HomeActivity
+        /*Jadi membuat objek intent bernama i, lalu
+        memanggil method startActivity dengan parameter i untuk menjalankannya
+        lalu finish() untuk menutup halaman saat ini yaitu MainActivity
+        * */
         Intent i = new Intent(MainActivity.this, HomeActivity.class);
         startActivity(i);
         finish();
 
-        // ini untuk menyimpan sesi login
+        // memanggil method createUserLoginSession() dengan mengirim parameter username dan code
         session.createUserLoginSession(username, code);
+        // pop up pemberitahuan
         Toast.makeText(this, "Product Activated", Toast.LENGTH_SHORT).show();
     }
 }

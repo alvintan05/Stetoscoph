@@ -85,6 +85,7 @@ public class DMLHelper {
     // fungsi untuk memasukkan data ke database
     public long insertData(Data data) {
         ContentValues args = new ContentValues();
+        // method untuk menaruh data sesuai dengan nama kolom dan datanya
         args.put(TITLE, data.getTitle());
         args.put(TIME, data.getTime());
         args.put(DATA, data.getData());

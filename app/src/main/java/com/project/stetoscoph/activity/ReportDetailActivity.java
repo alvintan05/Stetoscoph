@@ -20,7 +20,10 @@ import java.util.Iterator;
 
 public class ReportDetailActivity extends AppCompatActivity {
 
+    // variabel
     String getdata;
+
+    // variabel yang akan digunakan pada grafik
     GraphView graphView;
     LineGraphSeries<DataPoint> series = new LineGraphSeries<>();
     private double graphLastXValue = 0d;
@@ -29,10 +32,14 @@ public class ReportDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_detail);
+
+        // mengambil data yang dikirim sebelumnya
         getdata = getIntent().getStringExtra("data");
 
         if (getSupportActionBar() != null) {
+            // me-set judul toolbar
             getSupportActionBar().setTitle("Detail Report");
+            // menampilkan tombol back di toolbar
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
@@ -71,9 +78,9 @@ public class ReportDetailActivity extends AppCompatActivity {
         graph.getViewport().setScrollable(true);
         // agar grafik dapat di zoom
         graph.getViewport().setScalable(true);
-
+        // agar tidak ada border pada grafik
         graph.getViewport().setDrawBorder(false);
-
+        // menambahkan series/kumpulan titik pada grafik
         graph.addSeries(series);
     }
 
@@ -83,6 +90,7 @@ public class ReportDetailActivity extends AppCompatActivity {
         return super.onSupportNavigateUp();
     }
 
+    // fungsi untuk mengkonversi string menjadi array
     public ArrayList<Double> jsonToArrray(String json) {
         Gson gson = new Gson();
         Type type = new TypeToken<ArrayList<Double>>() {
@@ -96,13 +104,15 @@ public class ReportDetailActivity extends AppCompatActivity {
     * */
     public class TampilData extends AsyncTask<Void, Void, ArrayList> {
 
+        // widget progressdialog
         ProgressDialog progressDialog;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            // ini dijalankan sebelum eksekusi utama
 
-            // Memunculkan progress dialog
+            // Memunculkan progress dialog dengan teks Memuat Data...
             progressDialog = new ProgressDialog(ReportDetailActivity.this);
             progressDialog.setMessage("Memuat Data...");
             progressDialog.setCancelable(false);
@@ -111,8 +121,10 @@ public class ReportDetailActivity extends AppCompatActivity {
 
         @Override
         protected ArrayList doInBackground(Void... voids) {
+            // proses utama
+            // arraylist ini menampung hasil konversi fungsi jsonToArray
             ArrayList<Double> arrayList = jsonToArrray(getdata);
-            // Memanggil method
+            // Memanggil method untuk setData
             setData(arrayList);
             return null;
         }
@@ -120,6 +132,8 @@ public class ReportDetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList arrayList) {
             super.onPostExecute(arrayList);
+            // setelah proses utama selesai
+
             // Menghilangkan progress dialog
             progressDialog.dismiss();
         }
@@ -131,6 +145,7 @@ public class ReportDetailActivity extends AppCompatActivity {
             @Override
             public void run() {
                 for (int i = 0; i < arr.size(); i++) {
+                    // memanggil method untuk memasukkan titik x dan y
                     series.appendData(new DataPoint(graphLastXValue, arr.get(i)), false, arr.size());
                     graphLastXValue += 0.03;
                 }

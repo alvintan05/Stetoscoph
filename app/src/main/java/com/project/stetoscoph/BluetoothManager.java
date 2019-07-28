@@ -7,7 +7,7 @@ public class BluetoothManager {
 
     // class ini untuk menampung BluetoothDevice dari PairProductFragment agar dapat diakses oleh GraphFragment
 
-    // Bluetooth Stuff
+    // objek btAdapter dan btDevice
     private static BluetoothAdapter btAdapter;
     private BluetoothDevice btDevice;
 

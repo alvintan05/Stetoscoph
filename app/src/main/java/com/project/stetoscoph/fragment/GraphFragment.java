@@ -50,24 +50,32 @@ import me.aflak.bluetooth.Bluetooth;
  */
 public class GraphFragment extends Fragment implements Bluetooth.CommunicationCallback {
 
+    // widget
     Button btnStart, btnStop;
     TextView tvFrekuensi;
     ImageButton imgBtnSave;
 
+    // variable string
     private static final String TAG = "GraphFragment";
 
+    // variabel yang akan digunakan pada grafik
     private double graphLastXValue = 0d;
     double graphYValue = 0d;
     private LineGraphSeries<DataPoint> mSeries;
     private ArrayList<Double> dataArray = new ArrayList<>();
 
 
-    // Bluetooth Stuff
+    // variabel dari kelas BluetoothManager
     BluetoothManager btManager;
+    // variabel dari library Bluetooth
     private Bluetooth b;
 
+    // semua variabel ini nanti dijadikan objek
+    // variabel dari class DMLHelper
     DMLHelper dmlHelper;
+    // variabel dari class Data
     Data data;
+    // variabel dari class SessionSharedPreferences
     SessionSharedPreference session;
 
     public GraphFragment() {
@@ -86,17 +94,21 @@ public class GraphFragment extends Fragment implements Bluetooth.CommunicationCa
         btnStop = (Button) v.findViewById(R.id.btn_stop_stream);
         tvFrekuensi = (TextView) v.findViewById(R.id.tv_frekuensi);
         imgBtnSave = (ImageButton) v.findViewById(R.id.img_btn_save);
+
+        // pembuatan objek
         btManager = BluetoothManager.getInstance();
         dmlHelper = DMLHelper.getInstance(getActivity());
         session = new SessionSharedPreference(getActivity());
 
+        // memanggil method initGraph()
         initGraph(graph);
 
         // inisalisasi library bluetooth
         b = new Bluetooth(getActivity());
+        // memanggil method untuk melakukan komunikasi data bluetooth
         b.setCommunicationCallback(this);
 
-        // Button start di klik
+        //  Menghandle button start di klik
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,42 +117,57 @@ public class GraphFragment extends Fragment implements Bluetooth.CommunicationCa
             }
         });
 
-        // Button stop di klik
+        // Menghandle button stop di klik
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // memutus koneksi bluetooth
                 b.disconnect();
+                // memberi nilai 0 pada variabel dibawah
                 graphLastXValue = 0d;
+                // mereset data dalam series sehingga grafik akan kosong dan dapat diisi data baru
                 mSeries.resetData(new DataPoint[]{
                         new DataPoint(graphLastXValue, graphYValue)
                 });
+                // mengosongkan array yang menampung data bluetooth
+                // array disini nantinya digunakan untuk menyimpan ke dalam database
                 dataArray.clear();
             }
         });
 
-        // Ketika klik save
+        // Menghandle ketika klik tombol save
         imgBtnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // memanggil method pembuka database
                 dmlHelper.open();
+                // pembuatan objek data
                 data = new Data();
+                // variabel date yang menampung data dari fungsi getDateId()
                 String date = getDateId();
 
+                // melakukan set data
                 data.setTime(date);
                 data.setTitle(session.getUserName());
 
+                // melakukan convert data dari array ke string agar dapat disimpan ke database
                 String convert = convertArray(dataArray);
 
+                // melakukan set data
                 data.setData(convert);
 
+                // variabel result menampung hasil dari proses penyimpanan data
                 long result = dmlHelper.insertData(data);
 
+                // jika angkanya lebih dari 0 maka berhasil
                 if (result > 0) {
                     Toast.makeText(getActivity(), "Data berhasil ditambahkan", Toast.LENGTH_SHORT).show();
                 } else {
+                    // jika tidak maka gagal
                     Toast.makeText(getActivity(), "Data gagal ditambahkan", Toast.LENGTH_SHORT).show();
                 }
 
+                // memanggil method penutup database
                 dmlHelper.close();
             }
         });
@@ -165,18 +192,23 @@ public class GraphFragment extends Fragment implements Bluetooth.CommunicationCa
         graph.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.NONE);
         // title di x
         graph.getGridLabelRenderer().setHorizontalAxisTitle("time (s)");
+        // ukuran title
         graph.getGridLabelRenderer().setHorizontalAxisTitleTextSize(22);
         // title di y
         graph.getGridLabelRenderer().setVerticalAxisTitle("amplitudo (A)");
+        // ukuran title
         graph.getGridLabelRenderer().setVerticalAxisTitleTextSize(22);
 
+        // menghilangkan border di grafik
         graph.getViewport().setDrawBorder(false);
 
+        // mengeset mSeries ke graph
+        // mSeries ini berfungsi untuk menampung data dan kemudian digambar menjadi titik di grafik
         mSeries = new LineGraphSeries<>();
         graph.addSeries(mSeries);
     }
 
-    // Saat sudah konek ke device maka akan muncul toast berikut
+    // Saat sudah konek ke device maka akan muncul pop up berikut
     @Override
     public void onConnect(BluetoothDevice device) {
         getActivity().runOnUiThread(new Runnable() {
@@ -205,17 +237,22 @@ public class GraphFragment extends Fragment implements Bluetooth.CommunicationCa
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                // mengecek apakah data yang diterima kosong atau tidak
                 if (s.trim().equals("")) {
+                    // jika ya maka nilai y diset 0
                     graphYValue = 0.0;
                 } else {
+                    // jika ada data maka akan diconvert dari string mejadi double
                     graphYValue = Double.parseDouble(s.trim());
                 }
 
+                // menambahkan data ke dalam array untuk nanti disimpan ke database
                 dataArray.add(graphYValue);
 
                 // bagian ini untuk menambah titik pada grafik
                 mSeries.appendData(new DataPoint(graphLastXValue, graphYValue), true, 1000);
 
+                // menampilkan angka yang didapat ke layar
                 tvFrekuensi.setText(s + " hz");
                 // bagian ini untuk mengatur penambahan nilai x
                 graphLastXValue += 0.03;
@@ -243,6 +280,7 @@ public class GraphFragment extends Fragment implements Bluetooth.CommunicationCa
         return format.format(currentDate);
     }
 
+    // fungsi ini untuk mengkonversi data dari tipe array ke tipe string
     private String convertArray(ArrayList<Double> arrayList) {
         Gson gson = new Gson();
         return gson.toJson(arrayList);
