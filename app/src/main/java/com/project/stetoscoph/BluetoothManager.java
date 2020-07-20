@@ -5,7 +5,9 @@ import android.bluetooth.BluetoothDevice;
 
 public class BluetoothManager {
 
-    // Bluetooth Stuff
+    // class ini untuk menampung BluetoothDevice dari PairProductFragment agar dapat diakses oleh GraphFragment
+
+    // objek btAdapter dan btDevice
     private static BluetoothAdapter btAdapter;
     private BluetoothDevice btDevice;
 
@@ -30,10 +32,12 @@ public class BluetoothManager {
         return btManager;
     }
 
+    // fungsi untuk mengambil bluetooth device
     public BluetoothDevice getBtDevice() {
         return btDevice;
     }
 
+    // method untuk mengeset bluetooth device
     public void setBtDevice(BluetoothDevice btDevice) {
         this.btDevice = btDevice;
     }

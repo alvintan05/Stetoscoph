@@ -1,4 +1,4 @@
-package com.project.stetoscoph;
+package com.project.stetoscoph.fragment;
 
 
 import android.app.ProgressDialog;
@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.project.stetoscoph.AdapterReportData;
+import com.project.stetoscoph.R;
 import com.project.stetoscoph.database.DMLHelper;
 import com.project.stetoscoph.database.LoadDatasCallback;
 import com.project.stetoscoph.entity.Data;
@@ -24,10 +26,13 @@ import java.util.ArrayList;
  */
 public class ReportFragment extends Fragment implements LoadDatasCallback {
 
+    // widget
     private RecyclerView recyclerView;
+    private ProgressDialog progressDialog;
+
+    // variabel
     private AdapterReportData adapterReportData;
     private DMLHelper dmlHelper;
-    private ProgressDialog progressDialog;
 
     public ReportFragment() {
         // Required empty public constructor
@@ -40,20 +45,25 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_report, container, false);
 
-        // inisialisasi
+        // inisialisasi widget dan variabel
         recyclerView = (RecyclerView) v.findViewById(R.id.rv_data);
-        dmlHelper = DMLHelper.getInstance(getActivity());
         progressDialog = new ProgressDialog(getActivity());
 
+        // membuat objek
+        dmlHelper = DMLHelper.getInstance(getActivity());
+        // menampilkan progress dialog
         progressDialog.setMessage("Harap Tunggu");
 
+        // membuka database agar dapat diakses
         dmlHelper.open();
 
+        // mengatur list
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setHasFixedSize(true);
         adapterReportData = new AdapterReportData(getActivity());
         recyclerView.setAdapter(adapterReportData);
 
+        // Untuk melakukan load data
         new LoadDatasAsync(dmlHelper, this).execute();
 
         return v;
@@ -64,6 +74,7 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                // menampilkan progress dialog
                 progressDialog.show();
             }
         });
@@ -71,10 +82,13 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
 
     @Override
     public void postExecute(ArrayList<Data> datas) {
+        // menutup progress dialog
         progressDialog.dismiss();
+        // Menaruh data pada list
         adapterReportData.setListData(datas);
     }
 
+    // AsyncTask ini berjalan di background untuk melakukan proses agar tidak mengganggu UI penguna
     private static class LoadDatasAsync extends AsyncTask<Void, Void, ArrayList<Data>> {
 
         private final WeakReference<DMLHelper> weakDataHelper;
@@ -88,17 +102,23 @@ public class ReportFragment extends Fragment implements LoadDatasCallback {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            // sebelum eksekusi
+            // memanggil method preExecute() di atas
             weakCallback.get().preExecute();
         }
 
         @Override
         protected ArrayList<Data> doInBackground(Void... voids) {
+            // melakukan eksekusi
+            // Mengambil data dari database
             return weakDataHelper.get().getAllData();
         }
 
         @Override
         protected void onPostExecute(ArrayList<Data> data) {
             super.onPostExecute(data);
+            // setelah eksekusi
+            // memanggil method postExecute() di atas
             weakCallback.get().postExecute(data);
         }
     }

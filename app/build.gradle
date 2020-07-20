@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.project.stetoscoph"
-        minSdkVersion 15
+        minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -31,4 +31,5 @@ dependencies {
     implementation 'com.jjoe64:graphview:4.2.2'
     implementation 'com.github.GoodieBag:Pinview:v1.4'
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'me.aflak.libraries:bluetooth:1.2.4'
 }

@@ -10,9 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.project.stetoscoph.activity.PasswordLockScreenActivity;
+import com.project.stetoscoph.activity.ReportDetailActivity;
 import com.project.stetoscoph.entity.Data;
 
 import java.util.ArrayList;
+
+// class ini untuk mengatur list pada report fragment
 
 public class AdapterReportData extends RecyclerView.Adapter<AdapterReportData.ViewHolder> {
 
@@ -21,10 +25,6 @@ public class AdapterReportData extends RecyclerView.Adapter<AdapterReportData.Vi
 
     public AdapterReportData(Context context) {
         this.context = context;
-    }
-
-    public ArrayList<Data> getListData() {
-        return listData;
     }
 
     public void setListData(ArrayList<Data> listData) {
@@ -45,13 +45,15 @@ public class AdapterReportData extends RecyclerView.Adapter<AdapterReportData.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
+        // mengatur tampilan setiap item list
         viewHolder.tvJudul.setText(listData.get(i).getTitle());
         viewHolder.tvTanggal.setText(listData.get(i).getTime());
         viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, ReportDetailActivity.class);
+                Intent intent = new Intent(context, PasswordLockScreenActivity.class);
                 intent.putExtra("data", listData.get(i).getData());
+                intent.putExtra("nama", listData.get(i).getTitle());
                 context.startActivity(intent);
             }
         });

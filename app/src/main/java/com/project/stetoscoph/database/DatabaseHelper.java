@@ -5,10 +5,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-
+    // nama database
     public static String DATABASE_NAME = "dbstetoschop";
 
     private static final int DATABASE_VERSION = 1;
+
+    // fungsi untuk membuat tabel database dengan kolom id, title, time, dan data
     private static final String SQL_CREATE_TABLE = String.format("CREATE TABLE %s"
                     + " (%s INTEGER PRIMARY KEY AUTOINCREMENT," +
                     " %s TEXT NOT NULL," +
@@ -27,6 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // menjalankan method untuk membuat table database
         db.execSQL(SQL_CREATE_TABLE);
     }
 

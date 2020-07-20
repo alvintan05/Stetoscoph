@@ -15,9 +15,5 @@
             android:id="@+id/menu_report"
             android:icon="@drawable/ic_report"
             android:title="Report" />
-        <item
-            android:id="@+id/menu_lock"
-            android:icon="@drawable/ic_lock"
-            android:title="Lock App" />
     </group>
 </menu>

@@ -19,8 +19,10 @@ import static com.project.stetoscoph.database.DatabaseContract.TABLE_DATA;
 
 public class DMLHelper {
 
+    // Pendefinisian variabel string yang menampung nama tabel
     private static final String DATABASE_TABLE = TABLE_DATA;
 
+    // Pendefinisian variabel
     private static DatabaseHelper dataBaseHelper;
     private static DMLHelper INSTANCE;
     private static SQLiteDatabase database;
@@ -41,11 +43,12 @@ public class DMLHelper {
         return INSTANCE;
     }
 
-    // untuk membuka dan menutup koneksi database
+    // untuk membuka koneksi database
     public void open() throws SQLException {
         database = dataBaseHelper.getWritableDatabase();
     }
 
+    // untuk menutup koneksi database
     public void close() {
         dataBaseHelper.close();
         if (database.isOpen())
@@ -82,22 +85,10 @@ public class DMLHelper {
     // fungsi untuk memasukkan data ke database
     public long insertData(Data data) {
         ContentValues args = new ContentValues();
+        // method untuk menaruh data sesuai dengan nama kolom dan datanya
         args.put(TITLE, data.getTitle());
         args.put(TIME, data.getTime());
         args.put(DATA, data.getData());
         return database.insert(DATABASE_TABLE, null, args);
-    }
-
-    // fungsi untuk memperbarui data
-    public int updateData(Data data) {
-        ContentValues args = new ContentValues();
-        args.put(TITLE, data.getTitle());
-        args.put(TIME, data.getTime());
-        return database.update(DATABASE_TABLE, args, _ID + "= '" + data.getId() + "'", null);
-    }
-
-    // fungsi untuk menghapus data
-    public int deleteData(int id) {
-        return database.delete(TABLE_DATA, _ID + " = '" + id + "'", null);
     }
 }
