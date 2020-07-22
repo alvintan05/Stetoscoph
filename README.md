@@ -6,12 +6,12 @@ An android application using Bluetooth and SQLite to receive and save data from 
 ## Screenshots
 
 <p align="center">
-  <img src="screenshots/1.jpeg" width="270" alt="Login">
-  <img src="screenshots/2.jpeg" width="270" alt="Home">
-  <img src="screenshots/3.jpeg" width="270" alt="Graph">
-  <img src="screenshots/4.jpeg" width="270" alt="Report">
-  <img src="screenshots/5.jpeg" width="270" alt="Pin to see detail report">
-  <img src="screenshots/6.jpeg" width="270" alt="Detail Report"> 
+  <img src="screenshots/1.png" width="270" alt="Login">
+  <img src="screenshots/2.png" width="270" alt="Home">
+  <img src="screenshots/3.png" width="270" alt="Graph">
+  <img src="screenshots/4.png" width="270" alt="Report">
+  <img src="screenshots/5.png" width="270" alt="Pin to see detail report">
+  <img src="screenshots/6.png" width="270" alt="Detail Report"> 
 </p>
 
 ## Features
@@ -25,7 +25,7 @@ An android application using Bluetooth and SQLite to receive and save data from 
 - [x] SQLite
 - [x] <a href="https://github.com/jjoe64/GraphView" title="GraphView">GraphView</a> 
 - [x] <a href="https://github.com/OmarAflak/Bluetooth-Library" title="Bluetooth Library">Bluetooth Library</a> 
-- [x] <a href="https://github.com/GoodieBag/Pinview" title="PinView">PinViewy</a> 
+- [x] <a href="https://github.com/GoodieBag/Pinview" title="PinView">PinView</a> 
 
 ## Author
 
